@@ -3,3 +3,8 @@ node_modules/
 dist/
 coverage/
 *.log
+
+# Root-level generated workspace artifacts. Keep committed examples under examples/*/output.
+/input.md
+/project-state.json
+/output/

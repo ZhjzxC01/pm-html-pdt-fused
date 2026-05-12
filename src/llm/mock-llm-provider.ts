@@ -12,8 +12,9 @@ export class MockLLMProvider implements LLMProvider {
     }
 
     const input = request.messages.at(-1)?.content ?? "";
+    const userInput = extractUserInput(input);
     const now = new Date(0).toISOString();
-    const state = isExpenseApprovalInput(input) ? createExpenseApprovalProjectState(now) : createGenericB2BProjectState(input, now);
+    const state = isExpenseApprovalInput(userInput) ? createExpenseApprovalProjectState(now) : createGenericB2BProjectState(userInput, now);
     const artifact = resolveMockArtifact(input, state);
 
     return {
@@ -29,6 +30,15 @@ export class MockLLMProvider implements LLMProvider {
       })
     };
   }
+}
+
+function extractUserInput(promptInput: string): string {
+  const marker = "用户需求：";
+  const markerIndex = promptInput.lastIndexOf(marker);
+  if (markerIndex === -1) {
+    return promptInput;
+  }
+  return promptInput.slice(markerIndex + marker.length).trim();
 }
 
 function resolveMockArtifact(input: string, state: ProjectState): { agentName: string; output: unknown } {

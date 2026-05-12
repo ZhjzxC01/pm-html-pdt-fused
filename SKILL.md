@@ -1,5 +1,6 @@
 ---
 name: pm-html-pdt-fused
+version: 1.1.0
 description: 用户要求写 PRD、产品需求、功能清单、B 端原型、高保真 HTML 原型、页面标注、PRD 标注原型、根据原型生成 PRD、根据需求生成原型、检查 PRD 与原型一致性时使用。
 metadata:
   short-description: B 端 PRD / 原型 / 标注闭环
@@ -82,40 +83,59 @@ metadata:
 
 审查发现分三级：`critical`（必须修复）、`warning`（建议修复）、`suggestion`（优化建议）。`--strict` 模式下 `critical` 发现阻断生成。
 
+审查推荐场景：L 级需求建议开启全部 5 个关口；M 级需求建议仅开启 Gate 1 + Gate 5；S 级需求通常不需要开启。
+
 ## 阶段规则（按需读取）
 
 以下文件仅在执行到对应阶段时读取，不要在启动时预加载：
 
 | 阶段 | 文件 | 触发时机 |
 |------|------|----------|
-| 对话澄清 | `references/conversation-workflow.md` | 需要理解对话推进规则、变更模式、配置变更、Bug修复、数据迁移、系统对接、跳步模式流程时 |
+| 对话与模式 | `references/conversation-core.md` | 需要理解对话推进规则、自动初始化、澄清规则、增量修改时 |
+| 入口模式 | `references/conversation-modes.md` | 需要变更模式、配置变更、Bug修复、数据迁移、系统对接、跳步、恢复等非默认流程时 |
 | 交付闭环 | `references/delivery-loop.md` | 需要确认主交付物、支撑产物边界、业务确认单或上线交付包时 |
 | B 端业务规则 | `references/b2b-product-rules.md` | 需要主数据管理、数据权限、批量操作、操作日志、编码规则、报表、导入导出等 B 端通用规则时 |
 | B 端页面模式 | `references/b2b-page-patterns.md` | 生成原型时需要选择页面模式（列表/看板/树形/多Tab/步骤表单等）时 |
 | B 端异常场景 | `references/b2b-exception-scenarios.md` | 生成 PRD 或原型时需要覆盖异常场景时 |
 | B 端交互模式 | `references/b2b-interaction-patterns.md` | 生成原型时需要选择交互模式（行内编辑/级联选择/搜索防抖等）时 |
+| PRD S 级模板 | `references/prd-templates/s-lightweight-card.md` | 生成 S 级轻量需求卡时 |
+| PRD M 级模板 | `references/prd-templates/m-feature-prd.md` | 生成 M 级功能版 PRD 时 |
+| PRD L 级模板 | `references/prd-templates/l-enterprise-prd.md` | 生成 L 级完整版 B 端 PRD 时 |
 | 质量校验 | `references/quality-checks.md` | 执行一致性检查或质量校验时 |
 | 自查清单 | `references/self-review.md` | 交付前自查时 |
 
-## 使用 TypeScript 内核
+## 对话模式 vs CLI 模式
 
-当前工程的核心能力仍在 TypeScript CLI 中：
+| 场景 | 使用方式 |
+|------|---------|
+| 用户提出新需求，需要生成原型和 PRD | 对话模式，按工作流逐节点推进 |
+| 用户说"帮我做个XX系统" | 对话模式，从自动初始化开始 |
+| 用户说"帮我跑一下一致性检查" | CLI 模式 `pnpm dev -- check` |
+| 用户说"重新渲染全部产物" | CLI 模式 `pnpm dev -- render all` |
+| 用户说"帮我出一个变更提案" | CLI 模式 `pnpm dev -- propose` |
+| 用户说"校验一下项目状态" | CLI 模式 `pnpm dev -- validate` |
+
+CLI 命令参考：
 
 ```bash
 pnpm install
 pnpm dev -- --help
-pnpm dev -- generate --input examples/expense-approval/input.md
-pnpm dev -- generate --input examples/expense-approval/input.md --review
-pnpm dev -- validate --project examples/expense-approval/project-state.json
-pnpm dev -- render all --project examples/expense-approval/project-state.json
-pnpm dev -- annotate --project examples/expense-approval/project-state.json
-pnpm dev -- check --project examples/expense-approval/project-state.json
-pnpm dev -- review --project examples/expense-approval/project-state.json --stage input
-pnpm dev -- propose --project examples/expense-approval/project-state.json --instruction "添加合同变更记录模块"
-pnpm dev -- serve
+pnpm dev -- generate --input <需求文件路径>
+pnpm dev -- generate --input <路径> --review
+pnpm dev -- validate --project <project-state.json>
+pnpm dev -- render all --project <project-state.json>
+pnpm dev -- annotate --project <project-state.json>
+pnpm dev -- check --project <project-state.json>
+pnpm dev -- review --project <路径> --stage <阶段>
+pnpm dev -- propose --project <路径> --instruction <指令>
+pnpm dev -- serve --project <项目目录>
 ```
 
 如果用户只是要产品分析或产物草稿，优先直接在对话中完成并写入合理文件；只有用户要求本地复现、批量生成、校验或调试时才展示 CLI。
+
+## 参考示例
+
+当生成产物时，如果不确定格式或质量标准，先读取 `examples/expense-approval/` 或 `examples/contract-approval/` 中的对应产物作为参考，然后生成当前项目的产物。
 
 ## 当前边界
 
@@ -124,34 +144,18 @@ pnpm dev -- serve
 3. PRD 支持 S/M/L 三级模板：AI 自动评估需求复杂度并建议级别，用户确认后使用对应模板生成 PRD。
 4. 当前通用生成器仍是保守模板，不等同于完整大模型需求理解；复杂行业字段、项目类型泛化和旧版模板迁移仍是后续增强任务。
 
-## Anti-Pattern 防护
+## Anti-Pattern 自查清单
 
-以下行为被视为反模式，必须避免：
+每个节点交付前执行以下检查。违反任何一条都必须在交付前修复：
 
-### "这个需求太简单，不需要走完整流程"
-
-每个需求都必须走完整流程。S 级需求的产出更精简，但流程步骤不能跳过。"简单"的需求恰恰是未经检验的假设最容易造成返工的地方。
-
-- S 级需求：功能清单可以更精简（3-5 个要点），原型可以是单页面，PRD 使用轻量模板（8 章节），但必须走完功能清单 → 原型 → PRD → 标注 → 一致性检查的完整闭环。
-- 跳过功能清单直接写 PRD = 禁止。
-- 跳过原型直接写 PRD = 禁止。
-- 跳过一致性检查直接交付 = 禁止。
-
-### "用户说得很清楚了，不需要澄清"
-
-即使用户描述看起来完整，也要检查是否有隐含假设。至少做一轮快速确认：
-- 核心业务对象是否明确。
-- 状态机是否有终态。
-- 审批流是否需要启用。
-- 角色范围是否完整。
-
-### "先给用户看个大概，细节后面再补"
-
-禁止交付半成品。每个节点的交付物必须是完整的，不能用"后续补充"来规避质量要求。如果信息不足导致某个 section 无法填写，明确标注"不适用"并说明原因，而不是留空或写"待定"。
-
-### "PRD 内容和原型差不多，就不重复写了"
-
-PRD 和原型的职责不同。原型用于可视化讨论，PRD 用于精确规格说明。两者必须各自完整，不能互相替代。PRD 中的每个规则必须明确写出，不能用"参见原型"代替。
+- [ ] **禁止跳步**：是否跳过了功能清单直接写原型或 PRD？（S 级也不例外）
+- [ ] **禁止越级**：是否在用户未确认时就开始了下一个 HARD-GATE 节点？
+- [ ] **禁止占位符**：产物中是否存在 TBD、TODO、待定、待补充、后续补充、暂不、略？
+- [ ] **禁止半成品**：是否有 section 只有标题没有实质内容？（信息不足请标注"不适用"并说明原因）
+- [ ] **禁止笼统描述**：是否有"添加适当的校验""处理边界情况"等无法执行的描述？
+- [ ] **禁止互相替代**：PRD 中是否用"参见原型"代替了具体规则？原型中是否用"参见 PRD"代替了具体交互？
+- [ ] **禁止过度假设**：是否在需求未提及的地方编造了业务规则而不是列入 pendingQuestions？
+- [ ] **确认检查**：至少检查了核心业务对象、状态机终态、审批流开关、角色范围？
 
 ## 增量修改与回退机制
 
@@ -181,132 +185,65 @@ PRD 和原型的职责不同。原型用于可视化讨论，PRD 用于精确规
 3. **执行修改**：修改指定产物后，自动重新生成所有 dirty 产物。
 4. **跳过 HARD-GATE**：回退产生的重新生成不需要每个节点都等待用户确认，但最终产物（标注完成后）需要用户确认。
 
-### 增量修改对话示例
+详细的增量修改对话示例见 `references/conversation-core.md`。
 
-```markdown
-用户：PRD 里的报销金额校验规则需要修改，上限从 50 万改为 100 万。
-
-回复：
-当前节点：增量修改 — PRD
-
-修改内容：报销金额上限从 500,000 元改为 1,000,000 元
-
-影响范围：
-- ✅ PRD：直接修改（已完成）
-- ⚠️ 标注：报销表单和审批面板的标注需更新金额阈值
-- ⚠️ 一致性检查：需重新执行
-
-是否自动重新生成标注并执行一致性检查？
-A. 是，全部重新生成（推荐）
-B. 只修改 PRD，标注和一致性检查稍后手动处理
-```
+## 存档与恢复
 
 ### 存档退出
 
 如果用户需要中断当前流程：
 
 1. **保存当前状态**：所有已生成的产物保留在项目目录中，`project-state.json` 记录当前进度。
-2. **记录断点**：在 `project-state.json` 的 `lifecycleStatus` 中记录当前节点（如 `"feature_list_done"`、`"prototype_done"`）。
-3. **恢复方式**：用户下次进入同一项目时，skill 读取 `project-state.json`，从断点继续，跳过已完成的 HARD-GATE。
+2. **记录断点**：在 `project-state.json` 的 `lifecycleStatus` 中记录当前节点。
+
+`lifecycleStatus` 合法值：
+
+| 值 | 含义 |
+|----|------|
+| `draft` | 刚初始化，尚未开始 |
+| `feature_list_done` | 功能清单已确认 |
+| `prototype_done` | 原型已确认 |
+| `complexity_assessed` | 复杂度评估已确认 |
+| `prd_done` | PRD 已确认 |
+| `annotation_done` | 标注已确认 |
+| `consistency_checked` | 一致性检查已完成 |
+| `delivered` | 全部交付完成 |
+
+### 恢复模式
+
+**触发条件**（满足任一）：
+- 用户说"继续上次的项目"或"继续 XX 项目"
+- 用户进入一个已存在 `project-state.json` 且 `lifecycleStatus` 非 `draft` 的项目目录
+- 用户提到一个当前工作目录下已存在的项目名
+
+**恢复流程**：
+1. 读取 `<project>/project-state.json`
+2. 向用户展示进度摘要：当前 `lifecycleStatus`、已完成的产物清单、上次修改时间
+3. 从断点继续：跳过已完成并确认过的 HARD-GATE 节点
+4. 如果有 dirty 产物，提示用户是否需要先重新生成
 
 ## 入口模式
 
-除默认的"从零新建"全流程外，skill 支持以下入口模式，根据用户输入自动识别：
+除默认的"从零新建"全流程外，skill 根据用户输入自动识别以下入口模式。详细流程见 `references/conversation-modes.md`。
 
-### 变更模式
+| 模式 | 触发关键词 | 一句话说明 |
+|------|-----------|-----------|
+| 变更模式 | 修改、调整、增加XX节点、去掉、改为 | 已有项目的功能变更，只修改受影响的产物 |
+| 配置变更模式 | 新增选项、修改阈值、调整权限、变更默认值 | 仅涉及枚举/阈值/权限的精简变更，不生成原型和 PRD |
+| 需求接入模式 | 我已有 PRD、根据 PRD 生成原型、只需要测试用例 | 用户带着已有产物进入，从中间节点开始 |
+| Bug 修复模式 | XX不对、XX报错、修复、fix | 生成 Bug 修复需求卡 + 影响评估 + 回归测试点 |
+| 数据迁移模式 | 迁移、历史数据、批量导入、旧系统 | 生成字段映射 + 清洗规则 + 验证方案 + 回滚方案 |
+| 系统对接模式 | 对接、同步、推送、集成、XX系统 | 生成接口方案 + 字段映射 + 异常处理 |
+| 恢复模式 | 继续上次、继续XX项目 | 读取已有 project-state.json，从断点继续 |
 
-当用户需求涉及"已上线功能"的修改时，走变更模式而非完整流程。
+## 生成失败处理
 
-**触发条件**（满足任一）：
-- 用户提到已有项目名或已有功能名（如"在报销模块上""合同功能需要改"）
-- 输入中包含变更语义词：修改、调整、增加XX节点、去掉、改为、升级、优化
-- 当前工作目录下已存在同名项目（`<project>/project-state.json` 存在且 `lifecycleStatus` 非 `"draft"`）
+当生成过程中遇到异常时，按以下策略处理：
 
-**变更模式流程**：
-1. 读取已有 `project-state.json`，展示当前功能概要
-2. 识别变更点：哪些实体（page/module/field/action/transition）需要修改
-3. 评估变更影响范围：列出受影响的下游产物
-4. 生成变更说明（变更前 → 变更后，diff 格式）
-5. 执行变更 + 受影响产物重新生成
-6. 变更后一致性检查（仅检查波及部分）
-
-**变更模式不需要**：重新初始化目录、重新生成原型全量页面、重新写完整 PRD。
-
-### 配置变更模式
-
-当用户需求仅涉及枚举值、阈值、权限等配置项变更时，走精简流程。
-
-**触发条件**（满足任一）：
-- 输入中包含配置变更语义：新增选项、新增枚举、修改阈值、调整权限、变更默认值、修改排序
-- 变更范围可明确归类为：字典项增删、数值阈值调整、角色权限增删、默认值修改、排序规则变更
-
-**配置变更模式流程**：
-1. 识别配置变更类型（字典/阈值/权限/默认值/排序）
-2. 定位受影响的页面和功能
-3. 生成配置变更说明：
-   - 变更内容（具体改了什么）
-   - 配置清单（需要在系统后台操作的配置项）
-   - 影响范围（哪些页面、哪些角色受影响）
-   - 回归测试点（改完后需要验证什么）
-4. 不生成原型、不生成完整 PRD、不生成标注
-
-### 需求接入模式
-
-当用户已有 PRD 文档或原型，只需要做部分流程时，走接入模式。
-
-**触发条件**：
-- 用户说"我已经有 PRD 了，只需要做一致性检查"
-- 用户说"帮我根据这个 PRD 生成原型"
-- 用户说"只需要生成测试用例"
-- 用户提供了已有的 PRD/原型/标注文件
-
-**接入模式流程**：
-1. 读取用户提供的已有产物
-2. 将已有产物导入 `project-state.json`（解析 PRD → prdSpec，解析原型 → prototypeSpec）
-3. 执行用户要求的指定节点
-4. 前置条件检查：目标节点依赖的上游产物是否已具备（如做一致性检查必须有 PRD + 原型 + 标注）
-
-### Bug 修复需求模式
-
-当用户需求属于已上线功能的 Bug 修复时，走精简的 Bug 修复流程。
-
-**触发条件**（满足任一）：
-- 输入中包含 Bug 语义词：XX不对、XX没生效、XX报错、XX显示异常、XX没反应、修复、fix
-- 用户描述的问题符合"预期行为 vs 实际行为"模式
-- 用户提到具体报错信息或异常截图
-
-**Bug 修复模式流程**：
-1. 生成 Bug 修复需求卡：问题描述、复现步骤、期望行为、影响范围
-2. 评估修复影响：是否涉及状态机、权限、数据一致性
-3. 生成回归测试点：修完后需要验证什么
-4. 不生成原型、不生成完整 PRD、不生成标注
-
-### 数据迁移需求模式
-
-当用户需求涉及历史数据迁移或批量导入时，走数据迁移流程。
-
-**触发条件**（满足任一）：
-- 输入中包含迁移语义词：迁移、导入、历史数据、批量导入、数据清洗、数据同步、旧系统
-- 用户提到需要从 Excel/CSV/外部系统导入数据
-
-**数据迁移模式流程**：
-1. 识别数据来源和目标：从哪个系统/文件迁移到哪个模块
-2. 生成字段映射表：源字段 → 目标字段 → 转换规则
-3. 生成数据清洗规则：异常值处理、缺失值处理、重复数据处理
-4. 生成迁移验证方案：迁移后数据条数校验、关键字段抽样比对、业务规则校验
-5. 生成回滚方案：迁移失败时如何回退
-
-### 系统对接需求模式
-
-当用户需求涉及与外部系统对接时，走系统对接流程。
-
-**触发条件**（满足任一）：
-- 输入中包含对接语义词：对接、同步、推送、拉取、集成、XX系统、接口调用
-- 用户提到需要与 ERP/CRM/OA/HR/财务系统等外部系统交互
-
-**系统对接模式流程**：
-1. 需求澄清：对接哪个系统、数据流向（单向/双向）、同步频率、触发条件
-2. 生成接口对接方案：接口清单、数据格式、调用方式、鉴权方式
-3. 生成字段映射表：本系统字段 ↔ 对方系统字段
-4. 异常场景覆盖：对方系统不可用、数据格式不匹配、推送失败重试、数据冲突处理
-5. 将对接方案整合到 PRD 的 `interface_integration` 章节
+| 异常类型 | 处理方式 |
+|----------|----------|
+| Zod Schema 校验失败 | 向用户展示具体的校验错误字段，调整输入或手动修正后重试 |
+| LLM 返回非 JSON 格式 | 尝试从返回文本中提取 JSON 块重新解析；失败则降级到 rule 模式 |
+| LLM 请求超时或网络错误 | 提示用户检查网络和 API Key，支持重试 |
+| 产物渲染失败 | 检查 `project-state.json` 完整性，修复后重新渲染 |
+| 一致性检查发现错误 | 如实报告错误清单，不得声称"通过"；定位到具体产物后修复 |

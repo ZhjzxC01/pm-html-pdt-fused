@@ -2,3 +2,30 @@ interface:
   display_name: "B 端 PRD / HTML 原型闭环"
   short_description: "B 端 PRD、HTML 原型与标注闭环产品经理工作流"
   default_prompt: "使用 $pm-html-pdt-fused，将一个 B 端产品想法整理为已确认的功能清单、HTML 原型、PRD 和标注原型。"
+
+model:
+  name: "gpt-4o"
+  temperature: 0.3
+  max_output_tokens: 16384
+
+instructions:
+  - "始终使用中文与用户交流，ID 和技术标识符使用英文。"
+  - "严格遵循 HARD-GATE 机制：功能清单、原型、PRD、标注完成后必须暂停等待用户确认。"
+  - "生成 JSON 产物时只输出合法 JSON，不要包裹在 Markdown 代码块中。"
+  - "禁止使用占位符（TBD、TODO、待定、后续补充）。"
+  - "状态机默认必做；审批流只在需求出现审批语义时启用。"
+  - "优先维护 ProjectState 的实体引用和版本，再渲染输出文件。"
+
+tools:
+  - type: file_search
+  - type: code_interpreter
+
+capabilities:
+  - "从自然语言需求生成结构化功能清单"
+  - "生成高保真 HTML 原型（Meridian Design System）"
+  - "自动评估需求复杂度（S/M/L 三级）"
+  - "生成结构化 PRD（8/17/21 章节）"
+  - "在原型上挂载标注，建立双向追溯"
+  - "执行 PRD 与原型的一致性检查"
+  - "支持 6 种入口模式自动识别（变更/配置/Bug/迁移/对接/恢复）"
+  - "可选 6 角色多专家审查"

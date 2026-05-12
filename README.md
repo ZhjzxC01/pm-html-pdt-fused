@@ -52,7 +52,7 @@ pnpm dev -- review --project <路径> --stage <阶段>      # 独立执行多角
 pnpm dev -- propose --project <路径> --instruction <指令>  # 自然语言生成变更提案
 pnpm dev -- apply-proposal --project <路径> --proposal <路径> # 应用变更提案
 pnpm dev -- undo --project <路径> --change <变更ID>      # 回滚指定变更
-pnpm dev -- serve [--host <地址>] [--port <端口>]        # 启动本地 Web UI
+pnpm dev -- serve [--project <路径>] [--host <地址>] [--port <端口>] # 启动本地 Web UI
 ```
 
 ### 生成模式
@@ -130,7 +130,7 @@ Gate 5（PRD 审查）         → 业务分析师 + 技术架构师
 ## 项目结构
 
 ```
-codex 版本的skill-fused/
+pm-html-pdt-fused/
 ├── src/
 │   ├── agents/              # 15 个 LLM Agent（每种产物一个）
 │   ├── cli/                 # CLI 命令定义
@@ -147,9 +147,9 @@ codex 版本的skill-fused/
 │   ├── validators/          # 校验器（一致性、图、HTML、规格）
 │   └── workflow/            # 工作流管道（生成/渲染/标注/检查/回滚）
 ├── prompts/                 # 16 个 Prompt 文件（7 生成 + 6 审查 + 3 支撑）
-├── examples/                # 示例项目（费用报销、合同审批）
-├── references/              # 参考文档（工作流、规则、质量标准）
-├── tests/                   # 测试（24 个测试文件）
+├── examples/                # 示例项目及生成产物
+├── references/              # 参考文档、业务规则、PRD 模板
+├── tests/                   # 测试（23 个测试文件）
 ├── bin/                     # CLI 入口
 ├── web/                     # Web UI 前端
 └── docs/                    # 文档
@@ -157,7 +157,7 @@ codex 版本的skill-fused/
 
 ## 技术栈
 
-- **语言**：TypeScript 5.7
+- **语言**：TypeScript 5.x
 - **运行时**：Node.js >= 20
 - **包管理**：pnpm 10
 - **CLI**：Commander.js
@@ -184,7 +184,8 @@ codex 版本的skill-fused/
 
 ## 参考文档
 
-- [references/conversation-workflow.md](references/conversation-workflow.md) — 对话工作流
+- [references/conversation-core.md](references/conversation-core.md) — 对话工作流（核心规则）
+- [references/conversation-modes.md](references/conversation-modes.md) — 入口模式（变更/配置/Bug/迁移/对接/恢复）
 - [references/delivery-loop.md](references/delivery-loop.md) — 交付闭环
 - [references/b2b-product-rules.md](references/b2b-product-rules.md) — B 端产品规则
 - [references/quality-checks.md](references/quality-checks.md) — 质量标准
@@ -192,4 +193,4 @@ codex 版本的skill-fused/
 
 ## 使用方式
 
-详见 [SKILL.md](SKILL.md)（技能定义）和 [使用手册.md](使用手册.md)（完整实战教程）。
+详见 [SKILL.md](SKILL.md)（技能定义）和 [使用手册.md](docs/使用手册.md)（完整实战教程）。
