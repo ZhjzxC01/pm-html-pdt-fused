@@ -1,0 +1,7 @@
+stateDiagram-v2
+  business_state_draft --> business_state_pending_manager_approval: 提交审批
+  business_state_pending_manager_approval --> business_state_pending_finance_review: 主管审批通过
+  business_state_pending_manager_approval --> business_state_rejected: 主管驳回
+  business_state_pending_finance_review --> business_state_pending_payment: 财务复核通过
+  business_state_pending_finance_review --> business_state_rejected: 财务驳回
+  business_state_pending_manager_approval --> business_state_withdrawn: 撤回报销单

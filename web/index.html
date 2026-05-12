@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PM HTML Skill</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="brand">PM HTML Skill</div>
+      <button class="nav active" data-view="project">项目</button>
+      <button class="nav" data-view="input">需求</button>
+      <button class="nav" data-view="prototype">原型</button>
+      <button class="nav" data-view="docs">文档</button>
+      <button class="nav" data-view="edit">修改</button>
+    </aside>
+    <main>
+      <header class="topbar">
+        <input id="projectRoot" aria-label="项目目录" />
+        <button id="loadProject">载入</button>
+        <button id="renderAll">渲染</button>
+        <button id="annotate">标注</button>
+        <button id="check">检查</button>
+      </header>
+
+      <section id="project" class="view active">
+        <div class="panel">
+          <h1>项目首页</h1>
+          <dl class="summary" id="projectSummary"></dl>
+        </div>
+        <div class="panel">
+          <h2>最近变更</h2>
+          <pre id="recentChanges"></pre>
+        </div>
+      </section>
+
+      <section id="input" class="view">
+        <div class="panel">
+          <div class="row">
+            <h1>需求输入</h1>
+            <select id="generateMode">
+              <option value="rule">rule</option>
+              <option value="llm">llm</option>
+              <option value="auto">auto</option>
+            </select>
+            <button id="saveInput">保存</button>
+            <button id="generate">生成</button>
+          </div>
+          <textarea id="inputEditor"></textarea>
+        </div>
+      </section>
+
+      <section id="prototype" class="view">
+        <div class="panel">
+          <div class="row">
+            <h1>原型预览</h1>
+            <select id="prototypeFile">
+              <option value="index.html">干净原型</option>
+              <option value="prototype-review.html">标注原型</option>
+            </select>
+            <button id="loadPrototype">打开</button>
+          </div>
+          <iframe id="prototypeFrame" title="原型预览"></iframe>
+        </div>
+      </section>
+
+      <section id="docs" class="view">
+        <div class="panel">
+          <div class="row">
+            <h1>文档与测试</h1>
+            <select id="docFile">
+              <option value="prd.md">PRD</option>
+              <option value="test-cases.md">测试用例</option>
+              <option value="gherkin.feature">Gherkin</option>
+              <option value="flow.mermaid">流程图</option>
+            </select>
+            <button id="loadDoc">查看</button>
+          </div>
+          <pre id="docViewer"></pre>
+        </div>
+      </section>
+
+      <section id="edit" class="view">
+        <div class="panel">
+          <h1>修改与检查</h1>
+          <textarea id="instruction" placeholder="输入自然语言修改指令"></textarea>
+          <div class="row">
+            <button id="propose">生成提案</button>
+            <button id="applyProposal">确认应用</button>
+            <button id="loadReport">查看检查报告</button>
+          </div>
+          <pre id="proposalViewer"></pre>
+        </div>
+      </section>
+
+      <footer id="status">就绪</footer>
+    </main>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

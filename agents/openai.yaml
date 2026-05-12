@@ -1,0 +1,4 @@
+interface:
+  display_name: "B 端 PRD / HTML 原型闭环"
+  short_description: "B 端 PRD、HTML 原型与标注闭环产品经理工作流"
+  default_prompt: "使用 $pm-html-pdt-fused，将一个 B 端产品想法整理为已确认的功能清单、HTML 原型、PRD 和标注原型。"

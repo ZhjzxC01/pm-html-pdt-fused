@@ -1,0 +1,1097 @@
+{
+  "id": "prototype_generic_b2b",
+  "pages": {
+    "byId": {
+      "page_list": {
+        "id": "page_list",
+        "name": "合同列表页",
+        "type": "list",
+        "goal": "查看、筛选、导出合同",
+        "routePath": "/items",
+        "layout": {
+          "layoutType": "top_nav_content",
+          "density": "compact",
+          "primaryRegion": "content",
+          "secondaryRegions": []
+        },
+        "modules": {
+          "byId": {
+            "module_filter": {
+              "id": "module_filter",
+              "name": "筛选区",
+              "type": "filter",
+              "fields": {
+                "byId": {
+                  "field_code": {
+                    "id": "field_code",
+                    "name": "编号",
+                    "fieldKey": "code",
+                    "type": "text",
+                    "required": true
+                  },
+                  "field_customer": {
+                    "id": "field_customer",
+                    "name": "客户名称",
+                    "fieldKey": "customerName",
+                    "type": "text",
+                    "required": true
+                  },
+                  "field_status": {
+                    "id": "field_status",
+                    "name": "状态",
+                    "fieldKey": "status",
+                    "type": "status",
+                    "required": true
+                  },
+                  "field_amount": {
+                    "id": "field_amount",
+                    "name": "金额",
+                    "fieldKey": "amount",
+                    "type": "money",
+                    "required": true
+                  },
+                  "field_owner": {
+                    "id": "field_owner",
+                    "name": "负责人",
+                    "fieldKey": "owner",
+                    "type": "user",
+                    "required": true
+                  },
+                  "field_current_node": {
+                    "id": "field_current_node",
+                    "name": "当前审批节点",
+                    "fieldKey": "currentNode",
+                    "type": "text",
+                    "required": false
+                  }
+                },
+                "order": [
+                  "field_code",
+                  "field_customer",
+                  "field_status",
+                  "field_amount",
+                  "field_owner",
+                  "field_current_node"
+                ]
+              },
+              "sourceRefs": [
+                {
+                  "entityType": "feature",
+                  "entityId": "feature_export"
+                }
+              ]
+            },
+            "module_table": {
+              "id": "module_table",
+              "name": "合同表格",
+              "type": "table",
+              "fields": {
+                "byId": {
+                  "field_code": {
+                    "id": "field_code",
+                    "name": "编号",
+                    "fieldKey": "code",
+                    "type": "text",
+                    "required": true
+                  },
+                  "field_customer": {
+                    "id": "field_customer",
+                    "name": "客户名称",
+                    "fieldKey": "customerName",
+                    "type": "text",
+                    "required": true
+                  },
+                  "field_name": {
+                    "id": "field_name",
+                    "name": "名称",
+                    "fieldKey": "name",
+                    "type": "text",
+                    "required": true
+                  },
+                  "field_amount": {
+                    "id": "field_amount",
+                    "name": "金额",
+                    "fieldKey": "amount",
+                    "type": "money",
+                    "required": true
+                  },
+                  "field_owner": {
+                    "id": "field_owner",
+                    "name": "负责人",
+                    "fieldKey": "owner",
+                    "type": "user",
+                    "required": true
+                  },
+                  "field_status": {
+                    "id": "field_status",
+                    "name": "状态",
+                    "fieldKey": "status",
+                    "type": "status",
+                    "required": true
+                  },
+                  "field_current_node": {
+                    "id": "field_current_node",
+                    "name": "当前审批节点",
+                    "fieldKey": "currentNode",
+                    "type": "text",
+                    "required": false
+                  }
+                },
+                "order": [
+                  "field_code",
+                  "field_customer",
+                  "field_name",
+                  "field_amount",
+                  "field_owner",
+                  "field_status",
+                  "field_current_node"
+                ]
+              },
+              "sourceRefs": [
+                {
+                  "entityType": "feature",
+                  "entityId": "feature_export"
+                }
+              ]
+            }
+          },
+          "order": [
+            "module_filter",
+            "module_table"
+          ]
+        },
+        "actions": {
+          "byId": {
+            "action_create": {
+              "id": "action_create",
+              "name": "新建",
+              "type": "create",
+              "placement": "toolbar",
+              "triggerComponent": "button",
+              "priority": "P0",
+              "permissionRuleIds": [
+                "permission_operator_create"
+              ],
+              "sourceRefs": [
+                {
+                  "entityType": "feature",
+                  "entityId": "feature_process"
+                }
+              ]
+            },
+            "action_search": {
+              "id": "action_search",
+              "name": "筛选",
+              "type": "search",
+              "placement": "toolbar",
+              "triggerComponent": "button",
+              "priority": "P1",
+              "permissionRuleIds": [],
+              "sourceRefs": [
+                {
+                  "entityType": "feature",
+                  "entityId": "feature_process"
+                }
+              ]
+            },
+            "action_reset": {
+              "id": "action_reset",
+              "name": "重置",
+              "type": "reset",
+              "placement": "toolbar",
+              "triggerComponent": "button",
+              "priority": "P1",
+              "permissionRuleIds": [],
+              "sourceRefs": [
+                {
+                  "entityType": "feature",
+                  "entityId": "feature_process"
+                }
+              ]
+            },
+            "action_export": {
+              "id": "action_export",
+              "name": "导出",
+              "type": "export",
+              "placement": "toolbar",
+              "triggerComponent": "button",
+              "priority": "P0",
+              "permissionRuleIds": [
+                "permission_admin_export"
+              ],
+              "sourceRefs": [
+                {
+                  "entityType": "feature",
+                  "entityId": "feature_export"
+                }
+              ]
+            },
+            "action_view_detail": {
+              "id": "action_view_detail",
+              "name": "查看详情",
+              "type": "view",
+              "placement": "row",
+              "triggerComponent": "link",
+              "priority": "P1",
+              "permissionRuleIds": [],
+              "sourceRefs": [
+                {
+                  "entityType": "feature",
+                  "entityId": "feature_process"
+                }
+              ]
+            }
+          },
+          "order": [
+            "action_create",
+            "action_search",
+            "action_reset",
+            "action_export",
+            "action_view_detail"
+          ]
+        },
+        "uiStates": {
+          "byId": {
+            "ui_state_empty": {
+              "id": "ui_state_empty",
+              "type": "empty",
+              "name": "空态",
+              "description": "暂无符合条件的数据"
+            },
+            "ui_state_error": {
+              "id": "ui_state_error",
+              "type": "error",
+              "name": "异常态",
+              "description": "数据加载失败"
+            },
+            "ui_state_no_permission": {
+              "id": "ui_state_no_permission",
+              "type": "no_permission",
+              "name": "无权限态",
+              "description": "当前角色无权访问该页面或操作"
+            }
+          },
+          "order": [
+            "ui_state_empty",
+            "ui_state_error",
+            "ui_state_no_permission"
+          ]
+        },
+        "roleVisibility": [
+          {
+            "roleId": "role_operator",
+            "visible": true
+          },
+          {
+            "roleId": "role_manager",
+            "visible": true
+          },
+          {
+            "roleId": "role_admin",
+            "visible": true
+          }
+        ],
+        "sourceRefs": [
+          {
+            "entityType": "feature",
+            "entityId": "feature_create"
+          },
+          {
+            "entityType": "feature",
+            "entityId": "feature_export"
+          }
+        ]
+      },
+      "page_detail": {
+        "id": "page_detail",
+        "name": "合同详情页",
+        "type": "detail",
+        "goal": "查看合同详情、状态和操作记录",
+        "routePath": "/items/:id",
+        "layout": {
+          "layoutType": "top_nav_content",
+          "density": "compact",
+          "primaryRegion": "content",
+          "secondaryRegions": []
+        },
+        "modules": {
+          "byId": {
+            "module_detail_card": {
+              "id": "module_detail_card",
+              "name": "合同详情",
+              "type": "detail_card",
+              "fields": {
+                "byId": {
+                  "field_code": {
+                    "id": "field_code",
+                    "name": "编号",
+                    "fieldKey": "code",
+                    "type": "text",
+                    "required": true
+                  },
+                  "field_customer": {
+                    "id": "field_customer",
+                    "name": "客户名称",
+                    "fieldKey": "customerName",
+                    "type": "text",
+                    "required": true
+                  },
+                  "field_name": {
+                    "id": "field_name",
+                    "name": "名称",
+                    "fieldKey": "name",
+                    "type": "text",
+                    "required": true
+                  },
+                  "field_amount": {
+                    "id": "field_amount",
+                    "name": "金额",
+                    "fieldKey": "amount",
+                    "type": "money",
+                    "required": true
+                  },
+                  "field_owner": {
+                    "id": "field_owner",
+                    "name": "负责人",
+                    "fieldKey": "owner",
+                    "type": "user",
+                    "required": true
+                  },
+                  "field_status": {
+                    "id": "field_status",
+                    "name": "状态",
+                    "fieldKey": "status",
+                    "type": "status",
+                    "required": true
+                  },
+                  "field_description": {
+                    "id": "field_description",
+                    "name": "说明",
+                    "fieldKey": "description",
+                    "type": "textarea",
+                    "required": true
+                  },
+                  "field_attachment": {
+                    "id": "field_attachment",
+                    "name": "附件",
+                    "fieldKey": "attachment",
+                    "type": "file",
+                    "required": false
+                  },
+                  "field_risk": {
+                    "id": "field_risk",
+                    "name": "风险提示",
+                    "fieldKey": "riskHint",
+                    "type": "textarea",
+                    "required": false
+                  }
+                },
+                "order": [
+                  "field_code",
+                  "field_customer",
+                  "field_name",
+                  "field_amount",
+                  "field_owner",
+                  "field_status",
+                  "field_description",
+                  "field_attachment",
+                  "field_risk"
+                ]
+              },
+              "sourceRefs": [
+                {
+                  "entityType": "feature",
+                  "entityId": "feature_create"
+                }
+              ]
+            },
+            "module_timeline": {
+              "id": "module_timeline",
+              "name": "状态记录",
+              "type": "log_timeline",
+              "fields": {
+                "byId": {
+                  "field_status": {
+                    "id": "field_status",
+                    "name": "状态",
+                    "fieldKey": "status",
+                    "type": "status",
+                    "required": true
+                  }
+                },
+                "order": [
+                  "field_status"
+                ]
+              },
+              "sourceRefs": [
+                {
+                  "entityType": "feature",
+                  "entityId": "feature_create"
+                }
+              ]
+            }
+          },
+          "order": [
+            "module_detail_card",
+            "module_timeline"
+          ]
+        },
+        "actions": {
+          "byId": {
+            "action_withdraw": {
+              "id": "action_withdraw",
+              "name": "撤回",
+              "type": "withdraw",
+              "placement": "toolbar",
+              "triggerComponent": "button",
+              "priority": "P0",
+              "permissionRuleIds": [
+                "permission_operator_withdraw"
+              ],
+              "sourceRefs": [
+                {
+                  "entityType": "feature",
+                  "entityId": "feature_process"
+                }
+              ]
+            }
+          },
+          "order": [
+            "action_withdraw"
+          ]
+        },
+        "uiStates": {
+          "byId": {
+            "ui_state_no_permission": {
+              "id": "ui_state_no_permission",
+              "type": "no_permission",
+              "name": "无权限态",
+              "description": "当前角色无权访问该页面或操作"
+            }
+          },
+          "order": [
+            "ui_state_no_permission"
+          ]
+        },
+        "roleVisibility": [
+          {
+            "roleId": "role_operator",
+            "visible": true
+          },
+          {
+            "roleId": "role_manager",
+            "visible": true
+          },
+          {
+            "roleId": "role_admin",
+            "visible": true
+          }
+        ],
+        "sourceRefs": [
+          {
+            "entityType": "feature",
+            "entityId": "feature_create"
+          },
+          {
+            "entityType": "feature",
+            "entityId": "feature_process"
+          }
+        ]
+      },
+      "page_create": {
+        "id": "page_create",
+        "name": "新建合同页",
+        "type": "create",
+        "goal": "录入并提交合同",
+        "routePath": "/items/new",
+        "layout": {
+          "layoutType": "top_nav_content",
+          "density": "compact",
+          "primaryRegion": "content",
+          "secondaryRegions": []
+        },
+        "modules": {
+          "byId": {
+            "module_form": {
+              "id": "module_form",
+              "name": "合同表单",
+              "type": "form",
+              "fields": {
+                "byId": {
+                  "field_customer": {
+                    "id": "field_customer",
+                    "name": "客户名称",
+                    "fieldKey": "customerName",
+                    "type": "text",
+                    "required": true
+                  },
+                  "field_name": {
+                    "id": "field_name",
+                    "name": "名称",
+                    "fieldKey": "name",
+                    "type": "text",
+                    "required": true
+                  },
+                  "field_amount": {
+                    "id": "field_amount",
+                    "name": "金额",
+                    "fieldKey": "amount",
+                    "type": "money",
+                    "required": true
+                  },
+                  "field_description": {
+                    "id": "field_description",
+                    "name": "说明",
+                    "fieldKey": "description",
+                    "type": "textarea",
+                    "required": true
+                  },
+                  "field_attachment": {
+                    "id": "field_attachment",
+                    "name": "附件",
+                    "fieldKey": "attachment",
+                    "type": "file",
+                    "required": false
+                  }
+                },
+                "order": [
+                  "field_customer",
+                  "field_name",
+                  "field_amount",
+                  "field_description",
+                  "field_attachment"
+                ]
+              },
+              "sourceRefs": [
+                {
+                  "entityType": "feature",
+                  "entityId": "feature_create"
+                }
+              ]
+            }
+          },
+          "order": [
+            "module_form"
+          ]
+        },
+        "actions": {
+          "byId": {
+            "action_submit": {
+              "id": "action_submit",
+              "name": "提交",
+              "type": "submit",
+              "placement": "form_footer",
+              "triggerComponent": "button",
+              "priority": "P0",
+              "permissionRuleIds": [
+                "permission_operator_submit"
+              ],
+              "sourceRefs": [
+                {
+                  "entityType": "feature",
+                  "entityId": "feature_process"
+                }
+              ]
+            }
+          },
+          "order": [
+            "action_submit"
+          ]
+        },
+        "uiStates": {
+          "byId": {
+            "ui_state_error": {
+              "id": "ui_state_error",
+              "type": "error",
+              "name": "异常态",
+              "description": "数据加载失败"
+            }
+          },
+          "order": [
+            "ui_state_error"
+          ]
+        },
+        "roleVisibility": [
+          {
+            "roleId": "role_operator",
+            "visible": true
+          },
+          {
+            "roleId": "role_manager",
+            "visible": true
+          },
+          {
+            "roleId": "role_admin",
+            "visible": true
+          }
+        ],
+        "sourceRefs": [
+          {
+            "entityType": "feature",
+            "entityId": "feature_create"
+          }
+        ]
+      },
+      "page_approval": {
+        "id": "page_approval",
+        "name": "合同审批处理页",
+        "type": "approval",
+        "goal": "处理合同审批",
+        "routePath": "/items/:id/approval",
+        "layout": {
+          "layoutType": "top_nav_content",
+          "density": "compact",
+          "primaryRegion": "content",
+          "secondaryRegions": []
+        },
+        "modules": {
+          "byId": {
+            "module_process_panel": {
+              "id": "module_process_panel",
+              "name": "审批面板",
+              "type": "approval_panel",
+              "fields": {
+                "byId": {
+                  "field_name": {
+                    "id": "field_name",
+                    "name": "名称",
+                    "fieldKey": "name",
+                    "type": "text",
+                    "required": true
+                  },
+                  "field_status": {
+                    "id": "field_status",
+                    "name": "状态",
+                    "fieldKey": "status",
+                    "type": "status",
+                    "required": true
+                  },
+                  "field_amount": {
+                    "id": "field_amount",
+                    "name": "金额",
+                    "fieldKey": "amount",
+                    "type": "money",
+                    "required": true
+                  },
+                  "field_description": {
+                    "id": "field_description",
+                    "name": "说明",
+                    "fieldKey": "description",
+                    "type": "textarea",
+                    "required": true
+                  },
+                  "field_attachment": {
+                    "id": "field_attachment",
+                    "name": "附件",
+                    "fieldKey": "attachment",
+                    "type": "file",
+                    "required": false
+                  }
+                },
+                "order": [
+                  "field_name",
+                  "field_status",
+                  "field_amount",
+                  "field_description",
+                  "field_attachment"
+                ]
+              },
+              "sourceRefs": [
+                {
+                  "entityType": "feature",
+                  "entityId": "feature_create"
+                }
+              ]
+            }
+          },
+          "order": [
+            "module_process_panel"
+          ]
+        },
+        "actions": {
+          "byId": {
+            "action_approve": {
+              "id": "action_approve",
+              "name": "通过",
+              "type": "approve",
+              "placement": "form_footer",
+              "triggerComponent": "button",
+              "priority": "P0",
+              "permissionRuleIds": [
+                "permission_manager_approve"
+              ],
+              "sourceRefs": [
+                {
+                  "entityType": "feature",
+                  "entityId": "feature_process"
+                }
+              ]
+            },
+            "action_reject": {
+              "id": "action_reject",
+              "name": "驳回",
+              "type": "reject",
+              "placement": "form_footer",
+              "triggerComponent": "button",
+              "priority": "P0",
+              "permissionRuleIds": [
+                "permission_manager_reject"
+              ],
+              "sourceRefs": [
+                {
+                  "entityType": "feature",
+                  "entityId": "feature_process"
+                }
+              ]
+            },
+            "action_return": {
+              "id": "action_return",
+              "name": "退回",
+              "type": "reject",
+              "placement": "toolbar",
+              "triggerComponent": "button",
+              "priority": "P0",
+              "permissionRuleIds": [
+                "permission_manager_return"
+              ],
+              "sourceRefs": [
+                {
+                  "entityType": "feature",
+                  "entityId": "feature_process"
+                }
+              ]
+            }
+          },
+          "order": [
+            "action_approve",
+            "action_reject",
+            "action_return"
+          ]
+        },
+        "uiStates": {
+          "byId": {
+            "ui_state_no_permission": {
+              "id": "ui_state_no_permission",
+              "type": "no_permission",
+              "name": "无权限态",
+              "description": "当前角色无权访问该页面或操作"
+            }
+          },
+          "order": [
+            "ui_state_no_permission"
+          ]
+        },
+        "roleVisibility": [
+          {
+            "roleId": "role_operator",
+            "visible": true
+          },
+          {
+            "roleId": "role_manager",
+            "visible": true
+          },
+          {
+            "roleId": "role_admin",
+            "visible": true
+          }
+        ],
+        "sourceRefs": [
+          {
+            "entityType": "feature",
+            "entityId": "feature_process"
+          }
+        ]
+      },
+      "page_log": {
+        "id": "page_log",
+        "name": "合同操作记录页",
+        "type": "log",
+        "goal": "查看完整状态和操作记录",
+        "routePath": "/items/:id/logs",
+        "layout": {
+          "layoutType": "top_nav_content",
+          "density": "compact",
+          "primaryRegion": "content",
+          "secondaryRegions": []
+        },
+        "modules": {
+          "byId": {
+            "module_log": {
+              "id": "module_log",
+              "name": "操作记录",
+              "type": "log_timeline",
+              "fields": {
+                "byId": {
+                  "field_status": {
+                    "id": "field_status",
+                    "name": "状态",
+                    "fieldKey": "status",
+                    "type": "status",
+                    "required": true
+                  }
+                },
+                "order": [
+                  "field_status"
+                ]
+              },
+              "sourceRefs": [
+                {
+                  "entityType": "feature",
+                  "entityId": "feature_create"
+                }
+              ]
+            }
+          },
+          "order": [
+            "module_log"
+          ]
+        },
+        "actions": {
+          "byId": {},
+          "order": []
+        },
+        "uiStates": {
+          "byId": {},
+          "order": []
+        },
+        "roleVisibility": [
+          {
+            "roleId": "role_operator",
+            "visible": true
+          },
+          {
+            "roleId": "role_manager",
+            "visible": true
+          },
+          {
+            "roleId": "role_admin",
+            "visible": true
+          }
+        ],
+        "sourceRefs": [
+          {
+            "entityType": "feature",
+            "entityId": "feature_process"
+          }
+        ]
+      }
+    },
+    "order": [
+      "page_list",
+      "page_detail",
+      "page_create",
+      "page_approval",
+      "page_log"
+    ]
+  },
+  "navigation": {
+    "byId": {
+      "navigation_list_to_create": {
+        "id": "navigation_list_to_create",
+        "fromPageId": "page_list",
+        "toPageId": "page_create",
+        "triggerActionId": "action_create",
+        "description": "点击新建进入新建合同页"
+      },
+      "navigation_list_to_detail": {
+        "id": "navigation_list_to_detail",
+        "fromPageId": "page_list",
+        "toPageId": "page_detail",
+        "triggerActionId": "action_view_detail",
+        "description": "点击查看进入合同详情"
+      },
+      "navigation_detail_to_log": {
+        "id": "navigation_detail_to_log",
+        "fromPageId": "page_detail",
+        "toPageId": "page_log",
+        "description": "从详情页查看操作记录"
+      },
+      "navigation_detail_to_approval": {
+        "id": "navigation_detail_to_approval",
+        "fromPageId": "page_detail",
+        "toPageId": "page_approval",
+        "description": "从详情页进入审批处理"
+      }
+    },
+    "order": [
+      "navigation_list_to_create",
+      "navigation_list_to_detail",
+      "navigation_detail_to_log",
+      "navigation_detail_to_approval"
+    ]
+  },
+  "permissions": {
+    "byId": {
+      "permission_operator_create": {
+        "id": "permission_operator_create",
+        "roleId": "role_operator",
+        "targetType": "action",
+        "targetId": "action_create",
+        "effect": "allow",
+        "dataScope": "self",
+        "reason": "经办人可以新建合同"
+      },
+      "permission_operator_submit": {
+        "id": "permission_operator_submit",
+        "roleId": "role_operator",
+        "targetType": "action",
+        "targetId": "action_submit",
+        "effect": "allow",
+        "dataScope": "self",
+        "reason": "经办人可以提交自己的合同"
+      },
+      "permission_operator_withdraw": {
+        "id": "permission_operator_withdraw",
+        "roleId": "role_operator",
+        "targetType": "action",
+        "targetId": "action_withdraw",
+        "effect": "allow",
+        "dataScope": "self",
+        "reason": "经办人可以撤回待处理合同"
+      },
+      "permission_manager_approve": {
+        "id": "permission_manager_approve",
+        "roleId": "role_manager",
+        "targetType": "action",
+        "targetId": "action_approve",
+        "effect": "allow",
+        "dataScope": "department",
+        "reason": "审批人可以通过合同"
+      },
+      "permission_manager_reject": {
+        "id": "permission_manager_reject",
+        "roleId": "role_manager",
+        "targetType": "action",
+        "targetId": "action_reject",
+        "effect": "allow",
+        "dataScope": "department",
+        "reason": "审批人可以驳回合同"
+      },
+      "permission_manager_return": {
+        "id": "permission_manager_return",
+        "roleId": "role_manager",
+        "targetType": "action",
+        "targetId": "action_return",
+        "effect": "allow",
+        "dataScope": "department",
+        "reason": "审批人可以退回合同要求修改"
+      },
+      "permission_legal_approve": {
+        "id": "permission_legal_approve",
+        "roleId": "role_legal",
+        "targetType": "action",
+        "targetId": "action_approve",
+        "effect": "allow",
+        "dataScope": "all",
+        "reason": "法务可以审批合同条款和风险"
+      },
+      "permission_legal_reject": {
+        "id": "permission_legal_reject",
+        "roleId": "role_legal",
+        "targetType": "action",
+        "targetId": "action_reject",
+        "effect": "allow",
+        "dataScope": "all",
+        "reason": "法务可以驳回存在条款风险的合同"
+      },
+      "permission_finance_approve": {
+        "id": "permission_finance_approve",
+        "roleId": "role_finance",
+        "targetType": "action",
+        "targetId": "action_approve",
+        "effect": "allow",
+        "dataScope": "all",
+        "reason": "财务可以审批合同开票和回款条件"
+      },
+      "permission_finance_reject": {
+        "id": "permission_finance_reject",
+        "roleId": "role_finance",
+        "targetType": "action",
+        "targetId": "action_reject",
+        "effect": "allow",
+        "dataScope": "all",
+        "reason": "财务可以驳回付款条件异常的合同"
+      },
+      "permission_admin_export": {
+        "id": "permission_admin_export",
+        "roleId": "role_admin",
+        "targetType": "action",
+        "targetId": "action_export",
+        "effect": "allow",
+        "dataScope": "all",
+        "reason": "管理员可以导出全部合同"
+      },
+      "permission_operator_view_own": {
+        "id": "permission_operator_view_own",
+        "roleId": "role_operator",
+        "targetType": "data",
+        "targetId": "object_main",
+        "effect": "allow",
+        "dataScope": "self",
+        "reason": "经办人查看自己的合同"
+      },
+      "permission_manager_view_team": {
+        "id": "permission_manager_view_team",
+        "roleId": "role_manager",
+        "targetType": "data",
+        "targetId": "object_main",
+        "effect": "allow",
+        "dataScope": "department",
+        "reason": "主管查看团队合同"
+      },
+      "permission_admin_view_all": {
+        "id": "permission_admin_view_all",
+        "roleId": "role_admin",
+        "targetType": "data",
+        "targetId": "object_main",
+        "effect": "allow",
+        "dataScope": "all",
+        "reason": "管理员查看全部合同"
+      }
+    },
+    "order": [
+      "permission_operator_create",
+      "permission_operator_submit",
+      "permission_operator_withdraw",
+      "permission_manager_approve",
+      "permission_manager_reject",
+      "permission_manager_return",
+      "permission_legal_approve",
+      "permission_legal_reject",
+      "permission_finance_approve",
+      "permission_finance_reject",
+      "permission_admin_export",
+      "permission_operator_view_own",
+      "permission_manager_view_team",
+      "permission_admin_view_all"
+    ]
+  },
+  "mockDataSets": {
+    "byId": {
+      "mock_items": {
+        "id": "mock_items",
+        "name": "合同列表样例",
+        "targetPageId": "page_list",
+        "records": [
+          {
+            "code": "合同-202604-001",
+            "customer": "华东示例客户",
+            "name": "合同样例 A",
+            "amount": "680000.00",
+            "owner": "张三",
+            "status": "待法务审批",
+            "currentNode": "法务审批"
+          },
+          {
+            "name": "合同样例 B",
+            "owner": "李四",
+            "status": "已完成"
+          }
+        ]
+      }
+    },
+    "order": [
+      "mock_items"
+    ]
+  }
+}

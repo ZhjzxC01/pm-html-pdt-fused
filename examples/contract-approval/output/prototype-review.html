@@ -1,0 +1,63 @@
+<!DOCTYPE html><html lang="zh-CN"><head>
+  <meta charset="utf-8">
+  <title>合同审批管理功能系统原型</title>
+  <style>
+    body { margin: 0; font-family: Arial, "Microsoft YaHei", sans-serif; color: #1f2937; background: #f5f7fb; }
+    header { height: 56px; display: flex; align-items: center; padding: 0 24px; background: #183153; color: #fff; }
+    main { padding: 20px 24px; }
+    section { margin: 0 0 18px; padding: 16px; background: #fff; border: 1px solid #d8dee8; border-radius: 6px; }
+    .toolbar { display: flex; gap: 8px; margin-top: 12px; }
+    button, a { border: 1px solid #9aa8bc; background: #fff; color: #183153; border-radius: 4px; padding: 7px 12px; text-decoration: none; }
+    .primary { background: #1f6feb; color: #fff; border-color: #1f6feb; }
+    .danger { color: #b42318; border-color: #f3b1aa; }
+    .grid { display: grid; grid-template-columns: repeat(3, minmax(140px, 1fr)); gap: 12px; }
+    .field { display: flex; flex-direction: column; gap: 4px; }
+    .state { color: #5b6472; font-size: 13px; }
+  </style>
+<style>.prd-annotation-badge{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;margin-left:6px;border:1px solid #1f6feb;border-radius:999px;background:#eaf2ff;color:#1f6feb;font-size:12px;font-weight:700}.prd-annotation-hidden .prd-annotation-badge{display:none}[data-annotation-id]{outline:1px dashed #1f6feb;outline-offset:2px}</style></head>
+<body>
+  <header><strong>合同审批管理功能系统</strong></header>
+  <main>
+    <section data-page-id="page_list" data-annotation-id="annotation_page_list" data-prd-section-ids="prd_section_page_list">
+      <h1>合同列表页</h1>
+      <section data-module-id="module_filter" data-annotation-id="annotation_module_filter" data-prd-section-ids="prd_section_module_filter">
+        <h2>筛选区</h2>
+        <div class="grid">
+          <label class="field"><span data-field-id="field_status" class="primary-field">状态</span><select><option>全部</option><option>待审批</option></select></label>
+          <label class="field"><span data-field-id="field_code" class="primary-field">合同编号</span><input value="合同-202604-001"></label>
+          <label class="field"><span data-field-id="field_customer" class="primary-field">客户名称</span><input value="华东示例客户"></label>
+          <label class="field"><span data-field-id="field_amount" class="primary-field">合同金额</span><input value="680000.00"></label>
+          <label class="field"><span data-field-id="field_owner" class="primary-field">创建人</span><input value="张三"></label>
+          <label class="field"><span data-field-id="field_current_node" class="primary-field">当前审批节点</span><select><option>全部</option><option>销售主管</option><option>法务</option><option>财务</option></select></label>
+          <label class="field"><span data-field-id="field_name" class="primary-field" data-annotation-id="annotation_field_name" data-prd-section-ids="prd_section_field_name">合同名称</span><button type="button" class="prd-annotation-badge" data-review-open="annotation_field_name">F1</button><input value="合同样例 A"></label>
+        </div>
+        <div class="toolbar"><button data-action-id="action_search">筛选</button><button data-action-id="action_reset">重置</button></div>
+      </section><button type="button" class="prd-annotation-badge" data-review-open="annotation_module_filter">M1</button>
+      <section data-module-id="module_table">
+        <h2>合同表格</h2>
+        <p><span data-field-id="field_code">合同-202604-001</span> / <span data-field-id="field_customer">华东示例客户</span> / <span data-field-id="field_name">合同样例 A</span> / <span data-field-id="field_amount">680000.00</span> / <span data-field-id="field_owner">张三</span> / <span data-field-id="field_status">待法务审批</span> / <span data-field-id="field_current_node">法务审批</span></p>
+        <div data-ui-state-id="ui_state_empty">空态：暂无符合条件的数据</div>
+        <div data-ui-state-id="ui_state_error">异常态：数据加载失败</div>
+        <div data-ui-state-id="ui_state_no_permission">无权限态：当前角色无权访问</div>
+        <div class="toolbar"><button class="primary" data-action-id="action_create">新建合同</button><button data-action-id="action_export" data-annotation-id="annotation_action_export" data-prd-section-ids="prd_section_permission_export">导出</button><button type="button" class="prd-annotation-badge" data-review-open="annotation_action_export">A3</button><a data-action-id="action_view_detail">查看详情</a></div>
+      </section>
+    </section><button type="button" class="prd-annotation-badge" data-review-open="annotation_page_list">P1</button>
+    <section data-page-id="page_detail">
+      <h1>合同详情页</h1>
+      <section data-module-id="module_detail_card"><h2>合同详情</h2><p><span data-field-id="field_code">合同-202604-001</span>，客户 <span data-field-id="field_customer">华东示例客户</span>，金额 <span data-field-id="field_amount">680000.00</span> 元。</p><p><span data-field-id="field_name">合同样例 A</span> 由 <span data-field-id="field_owner">张三</span> 创建，状态 <span data-field-id="field_status">待法务审批</span>。</p><p data-field-id="field_description">特殊条款说明、回款方式、付款条件和合同周期。</p><p data-field-id="field_attachment" class="primary-field">附件：合同正文、客户资质、报价单</p><p data-field-id="field_risk" class="primary-field">风险提示：存在特殊付款条件，需法务和财务关注。</p><div class="toolbar"><button data-action-id="action_withdraw">撤回</button></div></section>
+      <section data-module-id="module_timeline"><h2>状态记录</h2><ol><li>草稿</li><li>提交审批</li><li>销售主管通过</li><li>待法务审批</li></ol></section>
+    </section>
+    <section data-page-id="page_create">
+      <h1>新建合同页</h1>
+      <section data-module-id="module_form"><h2>合同表单</h2><p data-field-id="field_customer" class="primary-field">客户名称</p><p data-field-id="field_name">合同名称</p><p data-field-id="field_amount" class="primary-field">合同金额</p><p data-field-id="field_description" class="primary-field">特殊条款说明</p><p data-field-id="field_attachment" class="primary-field">附件</p><button class="primary" data-action-id="action_submit" data-annotation-id="annotation_action_submit" data-prd-section-ids="prd_section_action_submit">提交审批</button><button type="button" class="prd-annotation-badge" data-review-open="annotation_action_submit">A1</button></section>
+    </section>
+    <section data-page-id="page_approval"><h1>合同审批处理页</h1><section data-module-id="module_process_panel"><h2>审批面板</h2><p><span data-field-id="field_name">合同样例 A</span> 当前状态：<span data-field-id="field_status">待法务审批</span>，当前节点：<span data-field-id="field_current_node">法务审批</span></p><p><span data-field-id="field_amount" class="primary-field">680000.00</span> 元，合同金额以 50 万元为审批阈值，超过阈值时需要增加财务审批，不超过阈值时不进入财务审批。</p><p data-field-id="field_description">审批前需确认信息完整、权限合规、附件有效。合同超过金额阈值时按销售主管、法务、财务顺序审批；未超过阈值时按销售主管、法务顺序审批。</p><div class="toolbar"><button class="primary" data-action-id="action_approve" data-annotation-id="annotation_action_process" data-prd-section-ids="prd_section_action_approve">通过</button><button type="button" class="prd-annotation-badge" data-review-open="annotation_action_process">A2</button><button data-action-id="action_return">退回修改</button><button class="danger" data-action-id="action_reject">驳回</button></div></section></section>
+    <section data-page-id="page_log"><h1>合同操作记录页</h1><section data-module-id="module_log"><h2>操作记录</h2><ol><li>创建合同</li><li>审批处理</li></ol></section></section>
+  </main>
+
+<aside id="prd-review-panel" style="position:fixed;right:0;top:0;width:340px;height:100%;overflow:auto;background:#fff;border-left:1px solid #ddd;padding:16px;z-index:9999"><h2>PRD 标注</h2><button type="button" id="prd-toggle-annotations">隐藏/显示标注</button><ul><li><button type="button" data-review-target="annotation_page_list">P1 列表页说明</button><p><strong>合同列表页</strong><br>列表页提供合同筛选、查看、新建和管理员导出入口。</p><ul></ul></li>
+<li><button type="button" data-review-target="annotation_module_filter">M1 筛选区说明</button><p><strong>筛选区</strong><br>列表页支持按合同编号、客户名称、合同状态、合同金额范围、创建人、提交时间和当前审批节点筛选。</p><ul></ul></li>
+<li><button type="button" data-review-target="annotation_field_name">F1 合同名称字段</button><p><strong>合同名称字段</strong><br>合同名称为必填文本字段，用于列表识别和详情展示。</p><ul></ul></li>
+<li><button type="button" data-review-target="annotation_action_submit">A1 提交审批操作</button><p><strong>提交审批</strong><br>经办人提交后，合同进入待审批状态。合同金额以 50 万元为审批阈值，超过阈值时需要增加财务审批，不超过阈值时不进入财务审批。</p><ul><li>提交合同审批成功</li></ul></li>
+<li><button type="button" data-review-target="annotation_action_process">A2 审批通过流转</button><p><strong>审批通过</strong><br>审批人点击通过后，合同按审批路径流转；全部必经节点通过后进入已生效状态，并写入操作记录。合同超过金额阈值时按销售主管、法务、财务顺序审批；未超过阈值时按销售主管、法务顺序审批。</p><ul><li>审批通过</li></ul></li>
+<li><button type="button" data-review-target="annotation_action_export">A3 管理员导出权限</button><p><strong>管理员导出权限</strong><br>只有管理员可以看到导出入口并导出全部合同。</p><ul><li>管理员导出</li></ul></li></ul></aside><script>document.getElementById('prd-toggle-annotations')?.addEventListener('click',function(){document.body.classList.toggle('prd-annotation-hidden')});document.querySelectorAll('[data-review-target]').forEach(function(btn){btn.addEventListener('click',function(){var id=btn.getAttribute('data-review-target');document.querySelector('[data-annotation-id="'+id+'"]')?.scrollIntoView({behavior:'smooth',block:'center'});});});</script></body></html>

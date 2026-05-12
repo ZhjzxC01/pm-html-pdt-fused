@@ -1,0 +1,143 @@
+{
+  "id": "annotation_spec_expense_approval",
+  "sourcePrdSpecId": "prd_expense_approval",
+  "sourcePrototypeMetaId": "meta_expense_approval",
+  "generatedAt": "2026-04-26T11:26:03.531Z",
+  "annotations": {
+    "byId": {
+      "annotation_page_expense_list": {
+        "id": "annotation_page_expense_list",
+        "targetEntity": {
+          "entityType": "page",
+          "entityId": "page_expense_list"
+        },
+        "domSelector": "[data-page-id=\"page_expense_list\"]",
+        "annotationNumber": "P1",
+        "title": "页面说明",
+        "prdSectionIds": [
+          "prd_section_page_expense_list"
+        ],
+        "acceptanceCriterionIds": [],
+        "testCaseIds": [],
+        "permissionRuleIds": [],
+        "displayMode": "badge",
+        "severity": "info"
+      },
+      "annotation_module_expense_filter": {
+        "id": "annotation_module_expense_filter",
+        "targetEntity": {
+          "entityType": "module",
+          "entityId": "module_expense_filter"
+        },
+        "domSelector": "[data-module-id=\"module_expense_filter\"]",
+        "annotationNumber": "M1",
+        "title": "筛选区说明",
+        "prdSectionIds": [
+          "prd_section_module_expense_filter"
+        ],
+        "acceptanceCriterionIds": [],
+        "testCaseIds": [],
+        "permissionRuleIds": [],
+        "displayMode": "badge",
+        "severity": "info"
+      },
+      "annotation_field_expense_amount": {
+        "id": "annotation_field_expense_amount",
+        "targetEntity": {
+          "entityType": "field",
+          "entityId": "field_expense_amount"
+        },
+        "domSelector": "[data-field-id=\"field_expense_amount\"].primary-field",
+        "annotationNumber": "F1",
+        "title": "报销金额字段",
+        "prdSectionIds": [
+          "prd_section_field_expense_amount"
+        ],
+        "acceptanceCriterionIds": [
+          "criterion_submit_expense"
+        ],
+        "testCaseIds": [],
+        "permissionRuleIds": [],
+        "displayMode": "badge",
+        "severity": "info"
+      },
+      "annotation_action_submit_expense": {
+        "id": "annotation_action_submit_expense",
+        "targetEntity": {
+          "entityType": "action",
+          "entityId": "action_submit_expense"
+        },
+        "domSelector": "[data-action-id=\"action_submit_expense\"]",
+        "annotationNumber": "A1",
+        "title": "提交审批操作",
+        "prdSectionIds": [
+          "prd_section_action_submit_expense"
+        ],
+        "acceptanceCriterionIds": [
+          "criterion_submit_expense"
+        ],
+        "testCaseIds": [
+          "test_case_submit_expense_success"
+        ],
+        "permissionRuleIds": [],
+        "displayMode": "badge",
+        "severity": "info"
+      },
+      "annotation_action_approve_expense": {
+        "id": "annotation_action_approve_expense",
+        "targetEntity": {
+          "entityType": "action",
+          "entityId": "action_approve_expense"
+        },
+        "domSelector": "[data-action-id=\"action_approve_expense\"]",
+        "annotationNumber": "A2",
+        "title": "审批通过流转",
+        "prdSectionIds": [
+          "prd_section_transition_manager_approve"
+        ],
+        "acceptanceCriterionIds": [
+          "criterion_approve_expense"
+        ],
+        "testCaseIds": [
+          "test_case_manager_approve_expense"
+        ],
+        "permissionRuleIds": [],
+        "displayMode": "badge",
+        "severity": "info"
+      },
+      "annotation_action_export_expense": {
+        "id": "annotation_action_export_expense",
+        "targetEntity": {
+          "entityType": "action",
+          "entityId": "action_export_expense"
+        },
+        "domSelector": "[data-action-id=\"action_export_expense\"]",
+        "annotationNumber": "A3",
+        "title": "管理员导出权限",
+        "prdSectionIds": [
+          "prd_section_permission_admin_export"
+        ],
+        "acceptanceCriterionIds": [
+          "criterion_export_expense"
+        ],
+        "testCaseIds": [
+          "test_case_admin_export_expense"
+        ],
+        "permissionRuleIds": [
+          "permission_admin_export_expense"
+        ],
+        "displayMode": "badge",
+        "severity": "info"
+      }
+    },
+    "order": [
+      "annotation_page_expense_list",
+      "annotation_module_expense_filter",
+      "annotation_field_expense_amount",
+      "annotation_action_submit_expense",
+      "annotation_action_approve_expense",
+      "annotation_action_export_expense"
+    ]
+  },
+  "brokenLinks": []
+}

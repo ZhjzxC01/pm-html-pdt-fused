@@ -1,0 +1,143 @@
+{
+  "id": "annotation_spec_generic_b2b",
+  "sourcePrdSpecId": "prd_generic_b2b",
+  "sourcePrototypeMetaId": "meta_generic_b2b",
+  "generatedAt": "2026-04-26T11:14:21.110Z",
+  "annotations": {
+    "byId": {
+      "annotation_page_list": {
+        "id": "annotation_page_list",
+        "targetEntity": {
+          "entityType": "page",
+          "entityId": "page_list"
+        },
+        "domSelector": "[data-page-id=\"page_list\"]",
+        "annotationNumber": "P1",
+        "title": "列表页说明",
+        "prdSectionIds": [
+          "prd_section_page_list"
+        ],
+        "acceptanceCriterionIds": [],
+        "testCaseIds": [],
+        "permissionRuleIds": [],
+        "displayMode": "badge",
+        "severity": "info"
+      },
+      "annotation_module_filter": {
+        "id": "annotation_module_filter",
+        "targetEntity": {
+          "entityType": "module",
+          "entityId": "module_filter"
+        },
+        "domSelector": "[data-module-id=\"module_filter\"]",
+        "annotationNumber": "M1",
+        "title": "筛选区说明",
+        "prdSectionIds": [
+          "prd_section_module_filter"
+        ],
+        "acceptanceCriterionIds": [],
+        "testCaseIds": [],
+        "permissionRuleIds": [],
+        "displayMode": "badge",
+        "severity": "info"
+      },
+      "annotation_field_name": {
+        "id": "annotation_field_name",
+        "targetEntity": {
+          "entityType": "field",
+          "entityId": "field_name"
+        },
+        "domSelector": "[data-field-id=\"field_name\"].primary-field",
+        "annotationNumber": "F1",
+        "title": "合同名称字段",
+        "prdSectionIds": [
+          "prd_section_field_name"
+        ],
+        "acceptanceCriterionIds": [
+          "criterion_submit"
+        ],
+        "testCaseIds": [],
+        "permissionRuleIds": [],
+        "displayMode": "badge",
+        "severity": "info"
+      },
+      "annotation_action_submit": {
+        "id": "annotation_action_submit",
+        "targetEntity": {
+          "entityType": "action",
+          "entityId": "action_submit"
+        },
+        "domSelector": "[data-action-id=\"action_submit\"]",
+        "annotationNumber": "A1",
+        "title": "提交审批操作",
+        "prdSectionIds": [
+          "prd_section_action_submit"
+        ],
+        "acceptanceCriterionIds": [
+          "criterion_submit"
+        ],
+        "testCaseIds": [
+          "test_case_submit_success"
+        ],
+        "permissionRuleIds": [],
+        "displayMode": "badge",
+        "severity": "info"
+      },
+      "annotation_action_process": {
+        "id": "annotation_action_process",
+        "targetEntity": {
+          "entityType": "action",
+          "entityId": "action_approve"
+        },
+        "domSelector": "[data-action-id=\"action_approve\"]",
+        "annotationNumber": "A2",
+        "title": "审批通过流转",
+        "prdSectionIds": [
+          "prd_section_action_approve"
+        ],
+        "acceptanceCriterionIds": [
+          "criterion_process"
+        ],
+        "testCaseIds": [
+          "test_case_approve_success"
+        ],
+        "permissionRuleIds": [],
+        "displayMode": "badge",
+        "severity": "info"
+      },
+      "annotation_action_export": {
+        "id": "annotation_action_export",
+        "targetEntity": {
+          "entityType": "action",
+          "entityId": "action_export"
+        },
+        "domSelector": "[data-action-id=\"action_export\"]",
+        "annotationNumber": "A3",
+        "title": "管理员导出权限",
+        "prdSectionIds": [
+          "prd_section_permission_export"
+        ],
+        "acceptanceCriterionIds": [
+          "criterion_export"
+        ],
+        "testCaseIds": [
+          "test_case_admin_export"
+        ],
+        "permissionRuleIds": [
+          "permission_admin_export"
+        ],
+        "displayMode": "badge",
+        "severity": "info"
+      }
+    },
+    "order": [
+      "annotation_page_list",
+      "annotation_module_filter",
+      "annotation_field_name",
+      "annotation_action_submit",
+      "annotation_action_process",
+      "annotation_action_export"
+    ]
+  },
+  "brokenLinks": []
+}

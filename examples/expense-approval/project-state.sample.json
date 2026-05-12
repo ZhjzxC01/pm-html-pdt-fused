@@ -1,0 +1,30 @@
+{
+  "id": "project_expense_approval",
+  "name": "expense-approval",
+  "schemaVersion": "2.6.0",
+  "version": 0,
+  "updatedAt": "2026-04-26T00:00:00.000Z",
+  "lifecycleStatus": "draft",
+  "requirementCard": null,
+  "prototypeSpec": null,
+  "htmlPrototype": null,
+  "prototypeMeta": null,
+  "flowSpec": null,
+  "prdSpec": null,
+  "testCaseSpec": null,
+  "prototypeAnnotationSpec": null,
+  "traceability": {
+    "links": [],
+    "archivedLinks": []
+  },
+  "artifactManifest": {
+    "items": {
+      "byId": {},
+      "order": []
+    }
+  },
+  "issues": [],
+  "changeLog": [],
+  "dirtyArtifacts": [],
+  "lastStructuredGeneratedAt": {}
+}

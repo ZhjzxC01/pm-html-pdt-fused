@@ -1,0 +1,34 @@
+{
+  "name": "b2b-pm-html-prototype-skill",
+  "version": "0.1.0",
+  "description": "B 端产品经理高保真 HTML 原型驱动智能工作流内核",
+  "type": "module",
+  "bin": {
+    "pm-html-skill": "./dist/bin/pm-html-skill.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "dev": "tsx bin/pm-html-skill.ts"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0",
+    "commander": "^12.1.0",
+    "fast-json-patch": "^3.1.1",
+    "nanoid": "^5.0.7",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "execa": "^9.5.2",
+    "prettier": "^3.4.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@10.31.0"
+}

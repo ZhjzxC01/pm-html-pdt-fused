@@ -1,0 +1,10 @@
+stateDiagram-v2
+  business_state_draft --> business_state_pending_approval: 提交审批
+  business_state_pending_approval --> business_state_pending_legal: 主管审批通过
+  business_state_pending_legal --> business_state_pending_finance: 法务审批通过
+  business_state_pending_finance --> business_state_completed: 财务审批通过
+  business_state_pending_legal --> business_state_completed: 未超阈值法务审批通过
+  business_state_pending_approval --> business_state_rejected: 审批驳回
+  business_state_pending_approval --> business_state_returned: 退回修改
+  business_state_returned --> business_state_pending_approval: 修改后重新提交
+  business_state_pending_approval --> business_state_withdrawn: 撤回

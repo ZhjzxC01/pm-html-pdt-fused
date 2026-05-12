@@ -1,0 +1,294 @@
+{
+  "id": "meta_expense_approval",
+  "sourcePrototypeSpecId": "prototype_expense_approval",
+  "pageMappings": [
+    {
+      "id": "mapping_page_expense_list",
+      "entityId": "page_expense_list",
+      "entityType": "page",
+      "domSelector": "[data-page-id=\"page_expense_list\"]",
+      "dataAttribute": "data-page-id",
+      "dataValue": "page_expense_list",
+      "name": "费用报销列表页",
+      "mappingRole": "primary"
+    },
+    {
+      "id": "mapping_page_expense_detail",
+      "entityId": "page_expense_detail",
+      "entityType": "page",
+      "domSelector": "[data-page-id=\"page_expense_detail\"]",
+      "dataAttribute": "data-page-id",
+      "dataValue": "page_expense_detail",
+      "name": "费用报销详情页",
+      "mappingRole": "primary"
+    },
+    {
+      "id": "mapping_page_expense_create",
+      "entityId": "page_expense_create",
+      "entityType": "page",
+      "domSelector": "[data-page-id=\"page_expense_create\"]",
+      "dataAttribute": "data-page-id",
+      "dataValue": "page_expense_create",
+      "name": "新建报销单页",
+      "mappingRole": "primary"
+    },
+    {
+      "id": "mapping_page_expense_approval",
+      "entityId": "page_expense_approval",
+      "entityType": "page",
+      "domSelector": "[data-page-id=\"page_expense_approval\"]",
+      "dataAttribute": "data-page-id",
+      "dataValue": "page_expense_approval",
+      "name": "审批处理页",
+      "mappingRole": "primary"
+    },
+    {
+      "id": "mapping_page_expense_log",
+      "entityId": "page_expense_log",
+      "entityType": "page",
+      "domSelector": "[data-page-id=\"page_expense_log\"]",
+      "dataAttribute": "data-page-id",
+      "dataValue": "page_expense_log",
+      "name": "审批日志页",
+      "mappingRole": "primary"
+    }
+  ],
+  "moduleMappings": [
+    {
+      "id": "mapping_module_expense_filter",
+      "entityId": "module_expense_filter",
+      "entityType": "module",
+      "domSelector": "[data-module-id=\"module_expense_filter\"]",
+      "dataAttribute": "data-module-id",
+      "dataValue": "module_expense_filter",
+      "name": "筛选区",
+      "mappingRole": "primary"
+    },
+    {
+      "id": "mapping_module_expense_table",
+      "entityId": "module_expense_table",
+      "entityType": "module",
+      "domSelector": "[data-module-id=\"module_expense_table\"]",
+      "dataAttribute": "data-module-id",
+      "dataValue": "module_expense_table",
+      "name": "报销单表格",
+      "mappingRole": "primary"
+    },
+    {
+      "id": "mapping_module_expense_form",
+      "entityId": "module_expense_form",
+      "entityType": "module",
+      "domSelector": "[data-module-id=\"module_expense_form\"]",
+      "dataAttribute": "data-module-id",
+      "dataValue": "module_expense_form",
+      "name": "报销表单",
+      "mappingRole": "primary"
+    },
+    {
+      "id": "mapping_module_expense_detail_card",
+      "entityId": "module_expense_detail_card",
+      "entityType": "module",
+      "domSelector": "[data-module-id=\"module_expense_detail_card\"]",
+      "dataAttribute": "data-module-id",
+      "dataValue": "module_expense_detail_card",
+      "name": "报销详情",
+      "mappingRole": "primary"
+    },
+    {
+      "id": "mapping_module_expense_approval_panel",
+      "entityId": "module_expense_approval_panel",
+      "entityType": "module",
+      "domSelector": "[data-module-id=\"module_expense_approval_panel\"]",
+      "dataAttribute": "data-module-id",
+      "dataValue": "module_expense_approval_panel",
+      "name": "审批面板",
+      "mappingRole": "primary"
+    },
+    {
+      "id": "mapping_module_expense_log",
+      "entityId": "module_expense_log",
+      "entityType": "module",
+      "domSelector": "[data-module-id=\"module_expense_log\"]",
+      "dataAttribute": "data-module-id",
+      "dataValue": "module_expense_log",
+      "name": "审批日志",
+      "mappingRole": "primary"
+    }
+  ],
+  "fieldMappings": [
+    {
+      "id": "mapping_field_expense_amount",
+      "entityId": "field_expense_amount",
+      "entityType": "field",
+      "domSelector": "[data-field-id=\"field_expense_amount\"].primary-field",
+      "dataAttribute": "data-field-id",
+      "dataValue": "field_expense_amount",
+      "name": "报销金额",
+      "mappingRole": "primary"
+    },
+    {
+      "id": "mapping_field_expense_reason",
+      "entityId": "field_expense_reason",
+      "entityType": "field",
+      "domSelector": "[data-field-id=\"field_expense_reason\"].primary-field",
+      "dataAttribute": "data-field-id",
+      "dataValue": "field_expense_reason",
+      "name": "报销事由",
+      "mappingRole": "primary"
+    },
+    {
+      "id": "mapping_field_expense_status",
+      "entityId": "field_expense_status",
+      "entityType": "field",
+      "domSelector": "[data-field-id=\"field_expense_status\"].primary-field",
+      "dataAttribute": "data-field-id",
+      "dataValue": "field_expense_status",
+      "name": "审批状态",
+      "mappingRole": "primary"
+    },
+    {
+      "id": "mapping_field_expense_applicant",
+      "entityId": "field_expense_applicant",
+      "entityType": "field",
+      "domSelector": "[data-field-id=\"field_expense_applicant\"].primary-field",
+      "dataAttribute": "data-field-id",
+      "dataValue": "field_expense_applicant",
+      "name": "申请人",
+      "mappingRole": "primary"
+    },
+    {
+      "id": "mapping_field_expense_attachment",
+      "entityId": "field_expense_attachment",
+      "entityType": "field",
+      "domSelector": "[data-field-id=\"field_expense_attachment\"].primary-field",
+      "dataAttribute": "data-field-id",
+      "dataValue": "field_expense_attachment",
+      "name": "报销附件",
+      "mappingRole": "primary"
+    }
+  ],
+  "actionMappings": [
+    {
+      "id": "mapping_action_create_expense",
+      "entityId": "action_create_expense",
+      "entityType": "action",
+      "domSelector": "[data-action-id=\"action_create_expense\"]",
+      "dataAttribute": "data-action-id",
+      "dataValue": "action_create_expense",
+      "name": "新建报销单",
+      "mappingRole": "primary"
+    },
+    {
+      "id": "mapping_action_submit_expense",
+      "entityId": "action_submit_expense",
+      "entityType": "action",
+      "domSelector": "[data-action-id=\"action_submit_expense\"]",
+      "dataAttribute": "data-action-id",
+      "dataValue": "action_submit_expense",
+      "name": "提交审批",
+      "mappingRole": "primary"
+    },
+    {
+      "id": "mapping_action_approve_expense",
+      "entityId": "action_approve_expense",
+      "entityType": "action",
+      "domSelector": "[data-action-id=\"action_approve_expense\"]",
+      "dataAttribute": "data-action-id",
+      "dataValue": "action_approve_expense",
+      "name": "审批通过",
+      "mappingRole": "primary"
+    },
+    {
+      "id": "mapping_action_reject_expense",
+      "entityId": "action_reject_expense",
+      "entityType": "action",
+      "domSelector": "[data-action-id=\"action_reject_expense\"]",
+      "dataAttribute": "data-action-id",
+      "dataValue": "action_reject_expense",
+      "name": "驳回",
+      "mappingRole": "primary"
+    },
+    {
+      "id": "mapping_action_withdraw_expense",
+      "entityId": "action_withdraw_expense",
+      "entityType": "action",
+      "domSelector": "[data-action-id=\"action_withdraw_expense\"]",
+      "dataAttribute": "data-action-id",
+      "dataValue": "action_withdraw_expense",
+      "name": "撤回",
+      "mappingRole": "primary"
+    },
+    {
+      "id": "mapping_action_export_expense",
+      "entityId": "action_export_expense",
+      "entityType": "action",
+      "domSelector": "[data-action-id=\"action_export_expense\"]",
+      "dataAttribute": "data-action-id",
+      "dataValue": "action_export_expense",
+      "name": "导出",
+      "mappingRole": "primary"
+    },
+    {
+      "id": "mapping_action_view_expense_detail",
+      "entityId": "action_view_expense_detail",
+      "entityType": "action",
+      "domSelector": "[data-action-id=\"action_view_expense_detail\"]",
+      "dataAttribute": "data-action-id",
+      "dataValue": "action_view_expense_detail",
+      "name": "查看详情",
+      "mappingRole": "primary"
+    },
+    {
+      "id": "mapping_action_search_expense",
+      "entityId": "action_search_expense",
+      "entityType": "action",
+      "domSelector": "[data-action-id=\"action_search_expense\"]",
+      "dataAttribute": "data-action-id",
+      "dataValue": "action_search_expense",
+      "name": "筛选",
+      "mappingRole": "primary"
+    },
+    {
+      "id": "mapping_action_reset_expense_filter",
+      "entityId": "action_reset_expense_filter",
+      "entityType": "action",
+      "domSelector": "[data-action-id=\"action_reset_expense_filter\"]",
+      "dataAttribute": "data-action-id",
+      "dataValue": "action_reset_expense_filter",
+      "name": "重置",
+      "mappingRole": "primary"
+    }
+  ],
+  "uiStateMappings": [
+    {
+      "id": "mapping_ui_state_expense_empty",
+      "entityId": "ui_state_expense_empty",
+      "entityType": "ui_state",
+      "domSelector": "[data-ui-state-id=\"ui_state_expense_empty\"]",
+      "dataAttribute": "data-ui-state-id",
+      "dataValue": "ui_state_expense_empty",
+      "name": "空态",
+      "mappingRole": "primary"
+    },
+    {
+      "id": "mapping_ui_state_expense_error",
+      "entityId": "ui_state_expense_error",
+      "entityType": "ui_state",
+      "domSelector": "[data-ui-state-id=\"ui_state_expense_error\"]",
+      "dataAttribute": "data-ui-state-id",
+      "dataValue": "ui_state_expense_error",
+      "name": "异常态",
+      "mappingRole": "primary"
+    },
+    {
+      "id": "mapping_ui_state_expense_no_permission",
+      "entityId": "ui_state_expense_no_permission",
+      "entityType": "ui_state",
+      "domSelector": "[data-ui-state-id=\"ui_state_expense_no_permission\"]",
+      "dataAttribute": "data-ui-state-id",
+      "dataValue": "ui_state_expense_no_permission",
+      "name": "无权限态",
+      "mappingRole": "primary"
+    }
+  ]
+}

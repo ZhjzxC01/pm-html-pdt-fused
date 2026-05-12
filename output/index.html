@@ -1,0 +1,892 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <meta charset="utf-8" />
+  <title>业务单据管理系统原型</title>
+  <style>
+/* Meridian Design System */
+:root {
+  --color-primary: #2563EB;
+  --color-on-primary: #FFFFFF;
+  --color-primary-container: #DBEAFE;
+  --color-on-primary-container: #1E3A5F;
+  --color-secondary: #0F172A;
+  --color-on-secondary: #FFFFFF;
+  --color-secondary-container: #1E293B;
+  --color-on-secondary-container: #CBD5E1;
+  --color-tertiary: #0D9488;
+  --color-on-tertiary: #FFFFFF;
+  --color-tertiary-container: #CCFBF1;
+  --color-on-tertiary-container: #134E4A;
+  --color-error: #DC2626;
+  --color-on-error: #FFFFFF;
+  --color-error-container: #FEE2E2;
+  --color-on-error-container: #7F1D1D;
+  --color-surface: #FFFFFF;
+  --color-on-surface: #0F172A;
+  --color-surface-dim: #F8FAFC;
+  --color-surface-container-low: #F8FAFC;
+  --color-surface-container: #F1F5F9;
+  --color-surface-container-high: #E2E8F0;
+  --color-surface-container-highest: #CBD5E1;
+  --color-on-surface-variant: #64748B;
+  --color-outline: #94A3B8;
+  --color-outline-variant: #E2E8F0;
+  --color-inverse-surface: #1E293B;
+  --color-inverse-on-surface: #F1F5F9;
+  --color-inverse-primary: #93C5FD;
+  --color-background: #F8FAFC;
+  --color-on-background: #0F172A;
+  --shape-none: 0;
+  --shape-sm: 4px;
+  --shape-default: 6px;
+  --shape-md: 8px;
+  --shape-lg: 12px;
+  --shape-xl: 16px;
+  --shape-full: 9999px;
+  --elevation-0: none;
+  --elevation-1: 0 1px 3px rgba(15,23,42,0.04), 0 1px 2px rgba(15,23,42,0.06);
+  --elevation-2: 0 4px 6px -1px rgba(15,23,42,0.06), 0 2px 4px -2px rgba(15,23,42,0.04);
+  --elevation-3: 0 10px 15px -3px rgba(15,23,42,0.08), 0 4px 6px -4px rgba(15,23,42,0.04);
+  --elevation-4: 0 20px 25px -5px rgba(15,23,42,0.1), 0 8px 10px -6px rgba(15,23,42,0.04);
+}
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0;
+  font: 400 14px/22px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  letter-spacing: 0;
+  color: var(--color-on-surface);
+  background: var(--color-background);
+}
+h1 { font: 600 30px/38px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 0 0 20px; color: var(--color-on-surface); letter-spacing: -0.015em; }
+h2 { font: 600 24px/32px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 0 0 16px; color: var(--color-on-surface); letter-spacing: -0.01em; }
+h3 { font: 600 20px/28px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 0 0 12px; color: var(--color-on-surface); }
+header {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  background: var(--color-surface);
+  color: var(--color-on-surface);
+  font: 600 20px/28px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  border-bottom: 1px solid var(--color-outline-variant);
+  position: relative;
+  z-index: 10;
+}
+header strong { font-weight: 600; }
+main { padding: 24px; }
+section[data-page-id] { margin: 0 0 24px; }
+section[data-module-id] {
+  background: var(--color-surface);
+  border: none;
+  border-radius: var(--shape-lg);
+  padding: 24px;
+  margin: 0 0 16px;
+  box-shadow: var(--elevation-1);
+}
+section[data-module-id]:last-child { margin-bottom: 0; }
+.toolbar { display: flex; gap: 8px; margin-top: 20px; flex-wrap: wrap; }
+button, [role="button"] {
+  height: 38px;
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--shape-md);
+  background: var(--color-surface);
+  color: var(--color-on-surface);
+  padding: 0 20px;
+  font: 500 14px/20px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: var(--elevation-0);
+}
+button:hover { box-shadow: var(--elevation-2); border-color: var(--color-outline); }
+button:active { box-shadow: var(--elevation-0); }
+.primary, .btn-primary {
+  background: var(--color-primary) !important;
+  color: var(--color-on-primary) !important;
+  border-color: var(--color-primary) !important;
+  box-shadow: var(--elevation-0) !important;
+}
+.primary:hover, .btn-primary:hover { background: #1D4ED8 !important; border-color: #1D4ED8 !important; box-shadow: var(--elevation-2) !important; }
+.danger, .btn-danger {
+  background: var(--color-error) !important;
+  color: var(--color-on-error) !important;
+  border-color: var(--color-error) !important;
+}
+.danger:hover, .btn-danger:hover { background: #B91C1C !important; border-color: #B91C1C !important; }
+a[data-action-id] {
+  height: 38px;
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--shape-md);
+  background: transparent;
+  color: var(--color-primary);
+  padding: 0 16px;
+  font: 500 14px/38px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+a[data-action-id]:hover { background: var(--color-primary-container); border-color: var(--color-primary); }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field > span,
+.field > label {
+  font: 500 12px/16px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  letter-spacing: 0.02em;
+  color: var(--color-on-surface-variant);
+}
+.field > span.primary-field { color: var(--color-on-surface-variant); }
+.field input,
+.field select,
+.field textarea {
+  height: 38px;
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--shape-md);
+  background: var(--color-surface);
+  color: var(--color-on-surface);
+  padding: 8px 12px;
+  font: 400 14px/22px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  letter-spacing: 0;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  width: 100%;
+}
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  border-width: 2px;
+  padding: 7px 11px;
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+}
+.field textarea { min-height: 80px; padding: 12px; resize: vertical; }
+.field-error {
+  color: var(--color-error) !important;
+  font: 400 12px/16px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+  letter-spacing: 0;
+  margin-top: 4px;
+}
+.state, [data-ui-state-id] {
+  color: var(--color-on-surface-variant);
+  font: 400 14px/22px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  letter-spacing: 0;
+  padding: 16px;
+  background: var(--color-surface-container);
+  border-radius: var(--shape-lg);
+  border: none;
+  margin-top: 12px;
+}
+table.mock-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+  font: 400 14px/22px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  letter-spacing: 0;
+}
+table.mock-table thead th {
+  text-align: left;
+  padding: 10px 16px;
+  background: var(--color-surface-container-low);
+  color: var(--color-on-surface-variant);
+  font: 500 12px/16px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  letter-spacing: 0.02em;
+  border-bottom: 1px solid var(--color-outline-variant);
+}
+table.mock-table tbody td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-outline-variant);
+  color: var(--color-on-surface);
+}
+table.mock-table tbody tr:hover { background: var(--color-surface-container-low); }
+ol, ul { padding-left: 24px; margin: 8px 0; }
+ol li, ul li { padding: 4px 0; font: 400 14px/22px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: var(--color-on-surface); }
+p { margin: 0 0 12px; color: var(--color-on-surface); }
+
+
+    body { margin: 0; font-family: Arial, "Microsoft YaHei", sans-serif; color: #1f2937; background: #f5f7fb; }
+    header { height: 56px; display: flex; align-items: center; padding: 0 24px; background: #183153; color: #fff; }
+    main { padding: 20px 24px; }
+    section { margin: 0 0 18px; padding: 16px; background: #fff; border: 1px solid #d8dee8; border-radius: 6px; }
+    .toolbar { display: flex; gap: 8px; margin-top: 12px; }
+    button, a { border: 1px solid #9aa8bc; background: #fff; color: #183153; border-radius: 4px; padding: 7px 12px; text-decoration: none; }
+    .primary { background: #1f6feb; color: #fff; border-color: #1f6feb; }
+    .danger { color: #b42318; border-color: #f3b1aa; }
+    .grid { display: grid; grid-template-columns: repeat(3, minmax(140px, 1fr)); gap: 12px; }
+    .field { display: flex; flex-direction: column; gap: 4px; }
+    .state { color: #5b6472; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <header><strong>业务单据管理系统</strong></header>
+  <main>
+    <section data-page-id="page_list">
+      <h1>业务单据列表页</h1>
+      <section data-module-id="module_filter">
+        <h2>筛选区</h2>
+        <div class="grid">
+          <label class="field"><span data-field-id="field_status" class="primary-field">状态</span><select><option>全部</option><option>处理中</option></select></label>
+          <label class="field"><span data-field-id="field_code" class="primary-field">业务单据编号</span><input value="业务单据-202604-001" /></label>
+          <label class="field"><span data-field-id="field_customer" class="primary-field">客户名称</span><input value="华东示例客户" /></label>
+          <label class="field"><span data-field-id="field_amount" class="primary-field">业务单据金额</span><input value="680000.00" /></label>
+          <label class="field"><span data-field-id="field_owner" class="primary-field">创建人</span><input value="张三" /></label>
+          <label class="field"><span data-field-id="field_current_node" class="primary-field">当前审批节点</span><select><option>全部</option><option>销售主管</option><option>法务</option><option>财务</option></select></label>
+          <label class="field"><span data-field-id="field_name" class="primary-field">业务单据名称</span><input value="业务单据样例 A" /></label>
+        </div>
+        <div class="toolbar"><button data-action-id="action_search">筛选</button><button data-action-id="action_reset">重置</button></div>
+      </section>
+      <section data-module-id="module_table">
+        <h2>业务单据表格</h2>
+        <p><span data-field-id="field_code">业务单据-202604-001</span> / <span data-field-id="field_customer">华东示例客户</span> / <span data-field-id="field_name">业务单据样例 A</span> / <span data-field-id="field_amount">680000.00</span> / <span data-field-id="field_owner">张三</span> / <span data-field-id="field_status">处理中</span> / <span data-field-id="field_current_node">法务审批</span></p>
+        <div data-ui-state-id="ui_state_empty">空态：暂无符合条件的数据</div>
+        <div data-ui-state-id="ui_state_error">异常态：数据加载失败</div>
+        <div data-ui-state-id="ui_state_no_permission">无权限态：当前角色无权访问</div>
+        <div class="toolbar"><button class="primary" data-action-id="action_create">新建业务单据</button><button data-action-id="action_export">导出</button><a data-action-id="action_view_detail">查看详情</a></div>
+      </section>
+    </section>
+    <section data-page-id="page_detail">
+      <h1>业务单据详情页</h1>
+      <section data-module-id="module_detail_card"><h2>业务单据详情</h2><p><span data-field-id="field_code">业务单据-202604-001</span>，客户 <span data-field-id="field_customer">华东示例客户</span>，金额 <span data-field-id="field_amount">680000.00</span> 元。</p><p><span data-field-id="field_name">业务单据样例 A</span> 由 <span data-field-id="field_owner">张三</span> 创建，状态 <span data-field-id="field_status">处理中</span>。</p><p data-field-id="field_description">特殊条款说明、回款方式、付款条件和合同周期。</p><p data-field-id="field_attachment" class="primary-field">附件：合同正文、客户资质、报价单</p><p data-field-id="field_risk" class="primary-field">风险提示：存在特殊付款条件，需法务和财务关注。</p><div class="toolbar"><button class="primary" data-action-id="action_complete">完成</button><button class="danger" data-action-id="action_return">退回</button></div></section>
+      <section data-module-id="module_timeline"><h2>状态记录</h2><ol><li>草稿</li><li>提交处理</li><li>销售主管通过</li><li>待法务审批</li></ol></section>
+    </section>
+    <section data-page-id="page_create">
+      <h1>新建业务单据页</h1>
+      <section data-module-id="module_form"><h2>业务单据表单</h2><p data-field-id="field_customer" class="primary-field">客户名称</p><p data-field-id="field_name">业务单据名称</p><p data-field-id="field_amount" class="primary-field">业务单据金额</p><p data-field-id="field_description" class="primary-field">特殊条款说明</p><p data-field-id="field_attachment" class="primary-field">附件</p><button class="primary" data-action-id="action_submit">提交处理</button></section>
+    </section>
+    
+    <section data-page-id="page_log"><h1>业务单据操作记录页</h1><section data-module-id="module_log"><h2>操作记录</h2><ol><li>创建业务单据</li><li>状态处理</li></ol></section></section>
+  </main>
+<!-- INTERACTIVE_ENGINE_START -->
+<script type="application/json" id="prototype-data">
+{
+  "pages": [
+    {
+      "id": "page_list",
+      "name": "业务单据列表页",
+      "type": "list"
+    },
+    {
+      "id": "page_detail",
+      "name": "业务单据详情页",
+      "type": "detail"
+    },
+    {
+      "id": "page_create",
+      "name": "新建业务单据页",
+      "type": "create"
+    },
+    {
+      "id": "page_log",
+      "name": "业务单据操作记录页",
+      "type": "log"
+    }
+  ],
+  "navigation": [
+    {
+      "id": "navigation_list_to_create",
+      "fromPageId": "page_list",
+      "toPageId": "page_create",
+      "triggerActionId": "action_create"
+    },
+    {
+      "id": "navigation_list_to_detail",
+      "fromPageId": "page_list",
+      "toPageId": "page_detail",
+      "triggerActionId": "action_view_detail"
+    },
+    {
+      "id": "navigation_detail_to_log",
+      "fromPageId": "page_detail",
+      "toPageId": "page_log"
+    }
+  ],
+  "stateMachines": [
+    {
+      "id": "state_machine_main",
+      "businessObjectId": "object_main",
+      "states": [
+        {
+          "id": "business_state_draft",
+          "name": "草稿",
+          "type": "initial"
+        },
+        {
+          "id": "business_state_processing",
+          "name": "处理中",
+          "type": "intermediate"
+        },
+        {
+          "id": "business_state_completed",
+          "name": "已完成",
+          "type": "terminal"
+        },
+        {
+          "id": "business_state_rejected",
+          "name": "已退回",
+          "type": "terminal"
+        }
+      ],
+      "transitions": [
+        {
+          "id": "transition_submit",
+          "name": "提交处理",
+          "fromStateId": "business_state_draft",
+          "toStateId": "business_state_processing",
+          "triggerActionId": "action_submit",
+          "allowedRoleIds": [
+            "role_operator"
+          ]
+        },
+        {
+          "id": "transition_complete",
+          "name": "处理完成",
+          "fromStateId": "business_state_processing",
+          "toStateId": "business_state_completed",
+          "triggerActionId": "action_complete",
+          "allowedRoleIds": [
+            "role_manager"
+          ]
+        },
+        {
+          "id": "transition_return",
+          "name": "退回修改",
+          "fromStateId": "business_state_processing",
+          "toStateId": "business_state_rejected",
+          "triggerActionId": "action_return",
+          "allowedRoleIds": [
+            "role_manager"
+          ]
+        }
+      ]
+    }
+  ],
+  "mockDataSets": [
+    {
+      "id": "mock_items",
+      "targetPageId": "page_list",
+      "records": [
+        {
+          "code": "业务单据-202604-001",
+          "customer": "华东示例客户",
+          "name": "业务单据样例 A",
+          "amount": "680000.00",
+          "owner": "张三",
+          "status": "处理中",
+          "currentNode": "主管审批"
+        },
+        {
+          "name": "业务单据样例 B",
+          "owner": "李四",
+          "status": "已完成"
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "id": "action_create",
+      "name": "新建",
+      "pageId": "page_list"
+    },
+    {
+      "id": "action_search",
+      "name": "筛选",
+      "pageId": "page_list"
+    },
+    {
+      "id": "action_reset",
+      "name": "重置",
+      "pageId": "page_list"
+    },
+    {
+      "id": "action_export",
+      "name": "导出",
+      "pageId": "page_list"
+    },
+    {
+      "id": "action_view_detail",
+      "name": "查看详情",
+      "pageId": "page_list"
+    },
+    {
+      "id": "action_complete",
+      "name": "完成",
+      "pageId": "page_detail"
+    },
+    {
+      "id": "action_return",
+      "name": "退回",
+      "pageId": "page_detail"
+    },
+    {
+      "id": "action_submit",
+      "name": "提交",
+      "pageId": "page_create"
+    }
+  ],
+  "fields": [
+    {
+      "id": "field_code",
+      "name": "编号",
+      "required": true,
+      "pageId": "page_list",
+      "moduleId": "module_filter"
+    },
+    {
+      "id": "field_customer",
+      "name": "客户名称",
+      "required": true,
+      "pageId": "page_list",
+      "moduleId": "module_filter"
+    },
+    {
+      "id": "field_status",
+      "name": "状态",
+      "required": true,
+      "pageId": "page_list",
+      "moduleId": "module_filter"
+    },
+    {
+      "id": "field_amount",
+      "name": "金额",
+      "required": true,
+      "pageId": "page_list",
+      "moduleId": "module_filter"
+    },
+    {
+      "id": "field_owner",
+      "name": "负责人",
+      "required": true,
+      "pageId": "page_list",
+      "moduleId": "module_filter"
+    },
+    {
+      "id": "field_current_node",
+      "name": "当前审批节点",
+      "required": false,
+      "pageId": "page_list",
+      "moduleId": "module_filter"
+    },
+    {
+      "id": "field_code",
+      "name": "编号",
+      "required": true,
+      "pageId": "page_list",
+      "moduleId": "module_table"
+    },
+    {
+      "id": "field_customer",
+      "name": "客户名称",
+      "required": true,
+      "pageId": "page_list",
+      "moduleId": "module_table"
+    },
+    {
+      "id": "field_name",
+      "name": "名称",
+      "required": true,
+      "pageId": "page_list",
+      "moduleId": "module_table"
+    },
+    {
+      "id": "field_amount",
+      "name": "金额",
+      "required": true,
+      "pageId": "page_list",
+      "moduleId": "module_table"
+    },
+    {
+      "id": "field_owner",
+      "name": "负责人",
+      "required": true,
+      "pageId": "page_list",
+      "moduleId": "module_table"
+    },
+    {
+      "id": "field_status",
+      "name": "状态",
+      "required": true,
+      "pageId": "page_list",
+      "moduleId": "module_table"
+    },
+    {
+      "id": "field_current_node",
+      "name": "当前审批节点",
+      "required": false,
+      "pageId": "page_list",
+      "moduleId": "module_table"
+    },
+    {
+      "id": "field_code",
+      "name": "编号",
+      "required": true,
+      "pageId": "page_detail",
+      "moduleId": "module_detail_card"
+    },
+    {
+      "id": "field_customer",
+      "name": "客户名称",
+      "required": true,
+      "pageId": "page_detail",
+      "moduleId": "module_detail_card"
+    },
+    {
+      "id": "field_name",
+      "name": "名称",
+      "required": true,
+      "pageId": "page_detail",
+      "moduleId": "module_detail_card"
+    },
+    {
+      "id": "field_amount",
+      "name": "金额",
+      "required": true,
+      "pageId": "page_detail",
+      "moduleId": "module_detail_card"
+    },
+    {
+      "id": "field_owner",
+      "name": "负责人",
+      "required": true,
+      "pageId": "page_detail",
+      "moduleId": "module_detail_card"
+    },
+    {
+      "id": "field_status",
+      "name": "状态",
+      "required": true,
+      "pageId": "page_detail",
+      "moduleId": "module_detail_card"
+    },
+    {
+      "id": "field_description",
+      "name": "说明",
+      "required": true,
+      "pageId": "page_detail",
+      "moduleId": "module_detail_card"
+    },
+    {
+      "id": "field_attachment",
+      "name": "附件",
+      "required": false,
+      "pageId": "page_detail",
+      "moduleId": "module_detail_card"
+    },
+    {
+      "id": "field_risk",
+      "name": "风险提示",
+      "required": false,
+      "pageId": "page_detail",
+      "moduleId": "module_detail_card"
+    },
+    {
+      "id": "field_status",
+      "name": "状态",
+      "required": true,
+      "pageId": "page_detail",
+      "moduleId": "module_timeline"
+    },
+    {
+      "id": "field_customer",
+      "name": "客户名称",
+      "required": true,
+      "pageId": "page_create",
+      "moduleId": "module_form"
+    },
+    {
+      "id": "field_name",
+      "name": "名称",
+      "required": true,
+      "pageId": "page_create",
+      "moduleId": "module_form"
+    },
+    {
+      "id": "field_amount",
+      "name": "金额",
+      "required": true,
+      "pageId": "page_create",
+      "moduleId": "module_form"
+    },
+    {
+      "id": "field_description",
+      "name": "说明",
+      "required": true,
+      "pageId": "page_create",
+      "moduleId": "module_form"
+    },
+    {
+      "id": "field_attachment",
+      "name": "附件",
+      "required": false,
+      "pageId": "page_create",
+      "moduleId": "module_form"
+    },
+    {
+      "id": "field_status",
+      "name": "状态",
+      "required": true,
+      "pageId": "page_log",
+      "moduleId": "module_log"
+    }
+  ]
+}
+</script>
+<script>
+(function(){
+var D=document.getElementById("prototype-data");
+if(!D)return;
+var P=JSON.parse(D.textContent);
+var currentPageId=P.pages.length>0?P.pages[0].id:null;
+var currentStateId=null;
+if(P.stateMachines.length>0){
+  var sm=P.stateMachines[0];
+  var init=sm.states.find(function(s){return s.type==="initial";});
+  if(init)currentStateId=init.id;
+}
+
+function injectDynamicStyles(){
+  var s=document.createElement("style");
+  s.textContent='[data-action-id]:active,[data-ui-state-id]:active{transform:scale(0.98);transition:transform 0.1s}'+
+    '[data-action-id]:focus-visible,[data-ui-state-id]:focus-visible{outline:2px solid var(--color-primary);outline-offset:2px}'+
+    '.proto-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--color-inverse-surface);color:var(--color-inverse-on-surface);padding:12px 24px;border-radius:var(--shape-md);font:400 14px/22px Inter,-apple-system,BlinkMacSystemFont,sans-serif;letter-spacing:0;box-shadow:var(--elevation-3);z-index:1000;opacity:0;transition:opacity 0.3s}'+
+    '.proto-toast.show{opacity:1}'+
+    '.proto-highlight{outline:2px solid var(--color-primary);outline-offset:2px;background:rgba(37,99,235,0.05)!important;transition:outline 0.2s,background 0.2s}'+
+    '.proto-nav-active{background:rgba(255,255,255,0.1)!important;color:var(--color-on-secondary)!important}'+
+    '.proto-dialog-overlay{position:fixed;inset:0;background:rgba(15,23,42,0.4);z-index:999;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.2s}'+
+    '.proto-dialog-overlay.show{opacity:1}'+
+    '.proto-dialog{background:var(--color-surface);border-radius:var(--shape-xl);padding:24px;min-width:280px;max-width:560px;box-shadow:var(--elevation-4)}'+
+    '.proto-dialog h3{font:600 20px/28px Inter,-apple-system,BlinkMacSystemFont,sans-serif;margin:0 0 16px;color:var(--color-on-surface)}'+
+    '.proto-dialog p{font:400 14px/22px Inter,-apple-system,BlinkMacSystemFont,sans-serif;color:var(--color-on-surface-variant);margin:0 0 24px}'+
+    '.proto-dialog-actions{display:flex;justify-content:flex-end;gap:8px}'+
+    '.proto-dialog-actions button{height:38px;border:none;border-radius:var(--shape-md);padding:0 20px;font:500 14px/20px Inter,-apple-system,BlinkMacSystemFont,sans-serif;cursor:pointer}'+
+    '.proto-dialog-actions .cancel{background:transparent;color:var(--color-primary);border:1px solid var(--color-outline-variant)}'+
+    '.proto-dialog-actions .confirm{background:var(--color-primary);color:var(--color-on-primary)}'+
+    '.proto-dialog-actions .confirm-danger{background:var(--color-error);color:var(--color-on-error)}';
+  document.head.appendChild(s);
+}
+
+function init(){
+  injectDynamicStyles();
+  addPageTabs();
+  addStatusBar();
+  bindNavigation();
+  bindStateTransitions();
+  bindFormValidation();
+  populateMockData();
+  showPage(currentPageId);
+  updateStatusBar();
+}
+
+function addPageTabs(){
+  var header=document.querySelector("header");
+  if(!header||P.pages.length<=1)return;
+  var nav=document.createElement("nav");
+  nav.style.cssText="display:flex;gap:4px;margin-left:24px;";
+  P.pages.forEach(function(p){
+    var btn=document.createElement("button");
+    btn.textContent=p.name;
+    btn.dataset.pageTabId=p.id;
+    btn.style.cssText="background:transparent;color:var(--color-on-surface-variant);border:none;border-radius:var(--shape-full);padding:10px 20px;cursor:pointer;font:500 14px/20px 'Inter',-apple-system,BlinkMacSystemFont,sans-serif;letter-spacing:0.01em;transition:background 0.15s ease;";
+    btn.addEventListener("click",function(){showPage(p.id);});
+    btn.addEventListener("mouseenter",function(){if(btn.dataset.pageTabId!==currentPageId){btn.style.background="var(--color-surface-container)";}});
+    btn.addEventListener("mouseleave",function(){if(btn.dataset.pageTabId!==currentPageId){btn.style.background="transparent";}});
+    nav.appendChild(btn);
+  });
+  header.appendChild(nav);
+}
+
+function showPage(pageId){
+  currentPageId=pageId;
+  document.querySelectorAll("[data-page-id]").forEach(function(el){
+    el.style.display=el.dataset.pageId===pageId?"":"none";
+  });
+  document.querySelectorAll("[data-page-tab-id]").forEach(function(btn){
+    var active=btn.dataset.pageTabId===pageId;
+    btn.style.background=active?"var(--color-surface-container)":"transparent";
+    btn.style.color=active?"var(--color-on-surface)":"var(--color-on-surface-variant)";
+    btn.style.fontWeight=active?"600":"500";
+  });
+  updateStatusBar();
+}
+
+function addStatusBar(){
+  var bar=document.createElement("div");
+  bar.id="prototype-status-bar";
+  bar.style.cssText="position:fixed;bottom:0;left:0;right:0;background:var(--color-surface);color:var(--color-on-surface-variant);padding:10px 24px;font:400 13px/20px 'Inter',-apple-system,BlinkMacSystemFont,sans-serif;letter-spacing:0;display:flex;gap:24px;z-index:9999;border-top:1px solid var(--color-outline-variant);";
+  bar.innerHTML='<span id="psb-page"></span><span id="psb-state"></span><span id="psb-actions"></span>';
+  document.body.appendChild(bar);
+  document.body.style.paddingBottom="48px";
+}
+
+function updateStatusBar(){
+  var pageEl=document.getElementById("psb-page");
+  var stateEl=document.getElementById("psb-state");
+  var actionsEl=document.getElementById("psb-actions");
+  if(!pageEl)return;
+  var page=P.pages.find(function(p){return p.id===currentPageId;});
+  pageEl.innerHTML="页面：<strong style=\"color:var(--color-on-surface)\">"+(page?page.name:"-")+"</strong>";
+  var stateName="-";
+  if(P.stateMachines.length>0){
+    var sm=P.stateMachines[0];
+    var st=sm.states.find(function(s){return s.id===currentStateId;});
+    if(st)stateName=st.name;
+  }
+  stateEl.innerHTML="业务状态：<strong style=\"color:var(--color-on-surface)\">"+stateName+"</strong>";
+  var available=[];
+  if(P.stateMachines.length>0&&currentPageId){
+    var sm2=P.stateMachines[0];
+    sm2.transitions.forEach(function(t){
+      if(t.fromStateId===currentStateId){
+        var act=P.actions.find(function(a){return a.id===t.triggerActionId&&a.pageId===currentPageId;});
+        if(act)available.push(act.name);
+      }
+    });
+  }
+  actionsEl.innerHTML="可用操作：<strong style=\"color:var(--color-on-surface)\">"+(available.length>0?available.join("、"):"无")+"</strong>";
+}
+
+function bindNavigation(){
+  document.addEventListener("click",function(e){
+    var el=e.target.closest("[data-action-id]");
+    if(!el)return;
+    var actionId=el.dataset.actionId;
+    var nav=P.navigation.find(function(n){return n.triggerActionId===actionId;});
+    if(nav){
+      e.preventDefault();
+      showPage(nav.toPageId);
+    }
+  });
+}
+
+function bindStateTransitions(){
+  document.addEventListener("click",function(e){
+    var el=e.target.closest("[data-action-id]");
+    if(!el)return;
+    var actionId=el.dataset.actionId;
+    if(P.stateMachines.length===0)return;
+    var sm=P.stateMachines[0];
+    var transition=sm.transitions.find(function(t){
+      return t.triggerActionId===actionId&&t.fromStateId===currentStateId;
+    });
+    if(!transition)return;
+    currentStateId=transition.toStateId;
+    var newState=sm.states.find(function(s){return s.id===currentStateId;});
+    document.querySelectorAll('[data-field-id*="status"]').forEach(function(el){
+      if(newState)el.textContent=newState.name;
+    });
+    updateActionVisibility(sm);
+    updateStatusBar();
+  });
+}
+
+function updateActionVisibility(sm){
+  document.querySelectorAll("[data-action-id]").forEach(function(btn){
+    var actionId=btn.dataset.actionId;
+    var relevant=sm.transitions.filter(function(t){return t.triggerActionId===actionId;});
+    if(relevant.length===0)return;
+    var available=relevant.some(function(t){return t.fromStateId===currentStateId;});
+    btn.style.display=available?"":"none";
+  });
+}
+
+function bindFormValidation(){
+  document.querySelectorAll("[data-field-required='true'] input, [data-field-required='true'] textarea, [data-field-required='true'] select").forEach(function(input){
+    input.addEventListener("blur",function(){
+      var parent=input.closest(".field")||input.parentElement;
+      var existing=parent.querySelector(".field-error");
+      if(!input.value.trim()){
+        if(!existing){
+          var err=document.createElement("span");
+          err.className="field-error";
+          err.textContent="此字段为必填项";
+          parent.appendChild(err);
+        }
+      }else if(existing){
+        existing.remove();
+      }
+    });
+  });
+  document.querySelectorAll("[data-action-id*='submit'], [data-action-id*='create']").forEach(function(btn){
+    btn.addEventListener("click",function(e){
+      var section=btn.closest("[data-page-id]");
+      if(!section)return;
+      var required=section.querySelectorAll("[data-field-required='true'] input, [data-field-required='true'] textarea");
+      var empty=false;
+      required.forEach(function(input){
+        if(!input.value.trim())empty=true;
+      });
+      if(empty){
+        e.preventDefault();
+        e.stopPropagation();
+        required.forEach(function(input){
+          if(!input.value.trim()){
+            var parent=input.closest(".field")||input.parentElement;
+            if(!parent.querySelector(".field-error")){
+              var err=document.createElement("span");
+              err.className="field-error";
+              err.textContent="此字段为必填项";
+              parent.appendChild(err);
+            }
+          }
+        });
+      }
+    });
+  });
+}
+
+function populateMockData(){
+  P.mockDataSets.forEach(function(ds){
+    var pageSection=document.querySelector('[data-page-id="'+ds.targetPageId+'"]');
+    if(!pageSection||ds.records.length===0)return;
+    var tableModule=pageSection.querySelector('[data-module-id*="table"]');
+    if(!tableModule)return;
+    var existing=tableModule.querySelector(".mock-table");
+    if(existing)return;
+    var keys=Object.keys(ds.records[0]);
+    var table=document.createElement("table");
+    table.className="mock-table";
+    var thead=document.createElement("thead");
+    var headRow=document.createElement("tr");
+    keys.forEach(function(k){
+      var th=document.createElement("th");
+      th.textContent=k;
+      headRow.appendChild(th);
+    });
+    thead.appendChild(headRow);
+    table.appendChild(thead);
+    var tbody=document.createElement("tbody");
+    ds.records.forEach(function(record){
+      var row=document.createElement("tr");
+      keys.forEach(function(k){
+        var td=document.createElement("td");
+        td.textContent=record[k]!=null?String(record[k]):"";
+        row.appendChild(td);
+      });
+      tbody.appendChild(row);
+    });
+    table.appendChild(tbody);
+    tableModule.appendChild(table);
+  });
+}
+
+if(document.readyState==="loading"){
+  document.addEventListener("DOMContentLoaded",init);
+}else{
+  init();
+}
+})();
+</script>
+<!-- INTERACTIVE_ENGINE_END -->
+</body>
+</html>

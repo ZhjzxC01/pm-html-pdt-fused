@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>费用报销审批原型</title>
+  <style>
+    body { margin: 0; font-family: Arial, "Microsoft YaHei", sans-serif; color: #1f2937; background: #f5f7fb; }
+    header { height: 56px; display: flex; align-items: center; padding: 0 24px; background: #183153; color: #fff; }
+    main { padding: 20px 24px; }
+    section { margin: 0 0 18px; padding: 16px; background: #fff; border: 1px solid #d8dee8; border-radius: 6px; }
+    .toolbar { display: flex; gap: 8px; margin-top: 12px; }
+    button, a { border: 1px solid #9aa8bc; background: #fff; color: #183153; border-radius: 4px; padding: 7px 12px; text-decoration: none; }
+    .primary { background: #1f6feb; color: #fff; border-color: #1f6feb; }
+    .danger { color: #b42318; border-color: #f3b1aa; }
+    .grid { display: grid; grid-template-columns: repeat(3, minmax(140px, 1fr)); gap: 12px; }
+    .field { display: flex; flex-direction: column; gap: 4px; }
+    .state { color: #5b6472; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <header><strong>费用报销审批</strong></header>
+  <main>
+    <section data-page-id="page_expense_list">
+      <h1>费用报销列表页</h1>
+      <section data-module-id="module_expense_filter">
+        <h2>筛选区</h2>
+        <div class="grid">
+          <label class="field"><span data-field-id="field_expense_status" class="primary-field">审批状态</span><select><option>全部</option><option>待主管审批</option></select></label>
+          <label class="field"><span data-field-id="field_expense_applicant" class="primary-field">申请人</span><input value="张三" /></label>
+          <label class="field"><span data-field-id="field_expense_amount" class="primary-field">报销金额</span><input value="1280.00" /></label>
+        </div>
+        <div class="toolbar"><button data-action-id="action_search_expense">筛选</button><button data-action-id="action_reset_expense_filter">重置</button></div>
+      </section>
+      <section data-module-id="module_expense_table">
+        <h2>报销单表格</h2>
+        <p><span data-field-id="field_expense_applicant">张三</span> 提交了 <span data-field-id="field_expense_amount">1280.00</span> 元报销，状态 <span data-field-id="field_expense_status">待主管审批</span></p>
+        <div class="toolbar"><button data-action-id="action_create_expense" class="primary">新建报销单</button><a data-action-id="action_view_expense_detail" href="#detail">查看详情</a><button data-action-id="action_export_expense">管理员导出</button></div>
+      </section>
+      <div data-ui-state-id="ui_state_expense_empty" class="state">暂无符合条件的报销单</div>
+      <div data-ui-state-id="ui_state_expense_error" class="state">报销单加载失败</div>
+      <div data-ui-state-id="ui_state_expense_no_permission" class="state">当前角色无权限查看全部报销单</div>
+    </section>
+
+    <section data-page-id="page_expense_detail" id="detail">
+      <h1>费用报销详情页</h1>
+      <section data-module-id="module_expense_detail_card"><h2>报销详情</h2><p>申请人、金额、事由、附件和当前状态。</p><button data-action-id="action_withdraw_expense">撤回</button></section>
+      <section data-module-id="module_expense_log_timeline"><h2>审批日志</h2><p>提交审批 -> 待主管审批</p></section>
+    </section>
+
+    <section data-page-id="page_expense_create">
+      <h1>新建报销单页</h1>
+      <section data-module-id="module_expense_form"><h2>报销表单</h2><label class="field"><span data-field-id="field_expense_reason" class="primary-field">报销事由</span><textarea>客户拜访交通费</textarea></label><label class="field"><span data-field-id="field_expense_attachment" class="primary-field">报销附件</span><input type="file" /></label><button data-action-id="action_submit_expense" class="primary">提交审批</button></section>
+    </section>
+
+    <section data-page-id="page_expense_approval">
+      <h1>审批处理页</h1>
+      <section data-module-id="module_expense_approval_panel"><h2>审批面板</h2><p>审批人确认金额、事由和附件后处理。</p><button data-action-id="action_approve_expense" class="primary">审批通过</button><button data-action-id="action_reject_expense" class="danger">驳回</button></section>
+    </section>
+
+    <section data-page-id="page_expense_log"><h1>审批日志页</h1><section data-module-id="module_expense_log"><h2>审批日志</h2><p>记录提交、审批、复核、驳回和撤回。</p></section></section>
+  </main>
+</body>
+</html>

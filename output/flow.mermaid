@@ -1,0 +1,4 @@
+stateDiagram-v2
+  business_state_draft --> business_state_processing: 提交处理
+  business_state_processing --> business_state_completed: 处理完成
+  business_state_processing --> business_state_rejected: 退回修改

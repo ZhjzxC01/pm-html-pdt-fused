@@ -1,0 +1,922 @@
+{
+  "id": "prototype_expense_approval",
+  "pages": {
+    "byId": {
+      "page_expense_list": {
+        "id": "page_expense_list",
+        "name": "费用报销列表页",
+        "type": "list",
+        "goal": "查看、筛选、导出费用报销单",
+        "routePath": "/expenses",
+        "layout": {
+          "layoutType": "top_nav_content",
+          "density": "compact",
+          "primaryRegion": "content",
+          "secondaryRegions": []
+        },
+        "modules": {
+          "byId": {
+            "module_expense_filter": {
+              "id": "module_expense_filter",
+              "name": "筛选区",
+              "type": "filter",
+              "fields": {
+                "byId": {
+                  "field_expense_status": {
+                    "id": "field_expense_status",
+                    "name": "审批状态",
+                    "fieldKey": "status",
+                    "type": "status",
+                    "required": true
+                  },
+                  "field_expense_applicant": {
+                    "id": "field_expense_applicant",
+                    "name": "申请人",
+                    "fieldKey": "applicant",
+                    "type": "user",
+                    "required": true
+                  },
+                  "field_expense_amount": {
+                    "id": "field_expense_amount",
+                    "name": "报销金额",
+                    "fieldKey": "amount",
+                    "type": "money",
+                    "required": true
+                  }
+                },
+                "order": [
+                  "field_expense_status",
+                  "field_expense_applicant",
+                  "field_expense_amount"
+                ]
+              },
+              "sourceRefs": [
+                {
+                  "entityType": "feature",
+                  "entityId": "feature_expense_submit"
+                }
+              ]
+            },
+            "module_expense_table": {
+              "id": "module_expense_table",
+              "name": "报销单表格",
+              "type": "table",
+              "fields": {
+                "byId": {
+                  "field_expense_applicant": {
+                    "id": "field_expense_applicant",
+                    "name": "申请人",
+                    "fieldKey": "applicant",
+                    "type": "user",
+                    "required": true
+                  },
+                  "field_expense_amount": {
+                    "id": "field_expense_amount",
+                    "name": "报销金额",
+                    "fieldKey": "amount",
+                    "type": "money",
+                    "required": true
+                  },
+                  "field_expense_status": {
+                    "id": "field_expense_status",
+                    "name": "审批状态",
+                    "fieldKey": "status",
+                    "type": "status",
+                    "required": true
+                  }
+                },
+                "order": [
+                  "field_expense_applicant",
+                  "field_expense_amount",
+                  "field_expense_status"
+                ]
+              },
+              "sourceRefs": [
+                {
+                  "entityType": "feature",
+                  "entityId": "feature_expense_submit"
+                }
+              ]
+            }
+          },
+          "order": [
+            "module_expense_filter",
+            "module_expense_table"
+          ]
+        },
+        "actions": {
+          "byId": {
+            "action_create_expense": {
+              "id": "action_create_expense",
+              "name": "新建报销单",
+              "type": "create",
+              "placement": "toolbar",
+              "triggerComponent": "button",
+              "priority": "P0",
+              "permissionRuleIds": [
+                "permission_employee_create_expense"
+              ],
+              "sourceRefs": [
+                {
+                  "entityType": "feature",
+                  "entityId": "feature_expense_approval"
+                }
+              ]
+            },
+            "action_search_expense": {
+              "id": "action_search_expense",
+              "name": "筛选",
+              "type": "search",
+              "placement": "toolbar",
+              "triggerComponent": "button",
+              "priority": "P1",
+              "permissionRuleIds": [],
+              "sourceRefs": [
+                {
+                  "entityType": "feature",
+                  "entityId": "feature_expense_approval"
+                }
+              ]
+            },
+            "action_reset_expense_filter": {
+              "id": "action_reset_expense_filter",
+              "name": "重置",
+              "type": "reset",
+              "placement": "toolbar",
+              "triggerComponent": "button",
+              "priority": "P1",
+              "permissionRuleIds": [],
+              "sourceRefs": [
+                {
+                  "entityType": "feature",
+                  "entityId": "feature_expense_approval"
+                }
+              ]
+            },
+            "action_export_expense": {
+              "id": "action_export_expense",
+              "name": "导出",
+              "type": "export",
+              "placement": "toolbar",
+              "triggerComponent": "button",
+              "priority": "P0",
+              "permissionRuleIds": [
+                "permission_admin_export_expense"
+              ],
+              "sourceRefs": [
+                {
+                  "entityType": "feature",
+                  "entityId": "feature_expense_export"
+                }
+              ]
+            },
+            "action_view_expense_detail": {
+              "id": "action_view_expense_detail",
+              "name": "查看详情",
+              "type": "view",
+              "placement": "row",
+              "triggerComponent": "link",
+              "priority": "P1",
+              "permissionRuleIds": [],
+              "sourceRefs": [
+                {
+                  "entityType": "feature",
+                  "entityId": "feature_expense_approval"
+                }
+              ]
+            }
+          },
+          "order": [
+            "action_create_expense",
+            "action_search_expense",
+            "action_reset_expense_filter",
+            "action_export_expense",
+            "action_view_expense_detail"
+          ]
+        },
+        "uiStates": {
+          "byId": {
+            "ui_state_expense_empty": {
+              "id": "ui_state_expense_empty",
+              "type": "empty",
+              "name": "空态",
+              "description": "暂无符合条件的报销单"
+            },
+            "ui_state_expense_error": {
+              "id": "ui_state_expense_error",
+              "type": "error",
+              "name": "异常态",
+              "description": "报销单加载失败"
+            },
+            "ui_state_expense_no_permission": {
+              "id": "ui_state_expense_no_permission",
+              "type": "no_permission",
+              "name": "无权限态",
+              "description": "当前角色无权访问该页面或操作"
+            }
+          },
+          "order": [
+            "ui_state_expense_empty",
+            "ui_state_expense_error",
+            "ui_state_expense_no_permission"
+          ]
+        },
+        "roleVisibility": [
+          {
+            "roleId": "role_employee",
+            "visible": true
+          },
+          {
+            "roleId": "role_manager",
+            "visible": true
+          },
+          {
+            "roleId": "role_finance",
+            "visible": true
+          },
+          {
+            "roleId": "role_admin",
+            "visible": true
+          }
+        ],
+        "sourceRefs": [
+          {
+            "entityType": "feature",
+            "entityId": "feature_expense_submit"
+          },
+          {
+            "entityType": "feature",
+            "entityId": "feature_expense_export"
+          }
+        ]
+      },
+      "page_expense_detail": {
+        "id": "page_expense_detail",
+        "name": "费用报销详情页",
+        "type": "detail",
+        "goal": "查看报销单详情和审批结果",
+        "routePath": "/expenses/:id",
+        "layout": {
+          "layoutType": "top_nav_content",
+          "density": "compact",
+          "primaryRegion": "content",
+          "secondaryRegions": []
+        },
+        "modules": {
+          "byId": {
+            "module_expense_detail_card": {
+              "id": "module_expense_detail_card",
+              "name": "报销详情",
+              "type": "detail_card",
+              "fields": {
+                "byId": {
+                  "field_expense_applicant": {
+                    "id": "field_expense_applicant",
+                    "name": "申请人",
+                    "fieldKey": "applicant",
+                    "type": "user",
+                    "required": true
+                  },
+                  "field_expense_amount": {
+                    "id": "field_expense_amount",
+                    "name": "报销金额",
+                    "fieldKey": "amount",
+                    "type": "money",
+                    "required": true
+                  },
+                  "field_expense_reason": {
+                    "id": "field_expense_reason",
+                    "name": "报销事由",
+                    "fieldKey": "reason",
+                    "type": "textarea",
+                    "required": true
+                  },
+                  "field_expense_status": {
+                    "id": "field_expense_status",
+                    "name": "审批状态",
+                    "fieldKey": "status",
+                    "type": "status",
+                    "required": true
+                  }
+                },
+                "order": [
+                  "field_expense_applicant",
+                  "field_expense_amount",
+                  "field_expense_reason",
+                  "field_expense_status"
+                ]
+              },
+              "sourceRefs": [
+                {
+                  "entityType": "feature",
+                  "entityId": "feature_expense_submit"
+                }
+              ]
+            },
+            "module_expense_log_timeline": {
+              "id": "module_expense_log_timeline",
+              "name": "审批日志",
+              "type": "log_timeline",
+              "fields": {
+                "byId": {
+                  "field_expense_status": {
+                    "id": "field_expense_status",
+                    "name": "审批状态",
+                    "fieldKey": "status",
+                    "type": "status",
+                    "required": true
+                  }
+                },
+                "order": [
+                  "field_expense_status"
+                ]
+              },
+              "sourceRefs": [
+                {
+                  "entityType": "feature",
+                  "entityId": "feature_expense_submit"
+                }
+              ]
+            }
+          },
+          "order": [
+            "module_expense_detail_card",
+            "module_expense_log_timeline"
+          ]
+        },
+        "actions": {
+          "byId": {
+            "action_withdraw_expense": {
+              "id": "action_withdraw_expense",
+              "name": "撤回",
+              "type": "withdraw",
+              "placement": "toolbar",
+              "triggerComponent": "button",
+              "priority": "P0",
+              "permissionRuleIds": [
+                "permission_employee_withdraw_expense"
+              ],
+              "sourceRefs": [
+                {
+                  "entityType": "feature",
+                  "entityId": "feature_expense_approval"
+                }
+              ]
+            }
+          },
+          "order": [
+            "action_withdraw_expense"
+          ]
+        },
+        "uiStates": {
+          "byId": {
+            "ui_state_expense_no_permission": {
+              "id": "ui_state_expense_no_permission",
+              "type": "no_permission",
+              "name": "无权限态",
+              "description": "当前角色无权访问该页面或操作"
+            }
+          },
+          "order": [
+            "ui_state_expense_no_permission"
+          ]
+        },
+        "roleVisibility": [
+          {
+            "roleId": "role_employee",
+            "visible": true
+          },
+          {
+            "roleId": "role_manager",
+            "visible": true
+          },
+          {
+            "roleId": "role_finance",
+            "visible": true
+          },
+          {
+            "roleId": "role_admin",
+            "visible": true
+          }
+        ],
+        "sourceRefs": [
+          {
+            "entityType": "feature",
+            "entityId": "feature_expense_submit"
+          },
+          {
+            "entityType": "feature",
+            "entityId": "feature_expense_approval"
+          }
+        ]
+      },
+      "page_expense_create": {
+        "id": "page_expense_create",
+        "name": "新建报销单页",
+        "type": "create",
+        "goal": "填写并提交费用报销单",
+        "routePath": "/expenses/new",
+        "layout": {
+          "layoutType": "top_nav_content",
+          "density": "compact",
+          "primaryRegion": "content",
+          "secondaryRegions": []
+        },
+        "modules": {
+          "byId": {
+            "module_expense_form": {
+              "id": "module_expense_form",
+              "name": "报销表单",
+              "type": "form",
+              "fields": {
+                "byId": {
+                  "field_expense_amount": {
+                    "id": "field_expense_amount",
+                    "name": "报销金额",
+                    "fieldKey": "amount",
+                    "type": "money",
+                    "required": true
+                  },
+                  "field_expense_reason": {
+                    "id": "field_expense_reason",
+                    "name": "报销事由",
+                    "fieldKey": "reason",
+                    "type": "textarea",
+                    "required": true
+                  },
+                  "field_expense_attachment": {
+                    "id": "field_expense_attachment",
+                    "name": "报销附件",
+                    "fieldKey": "attachment",
+                    "type": "file",
+                    "required": true
+                  }
+                },
+                "order": [
+                  "field_expense_amount",
+                  "field_expense_reason",
+                  "field_expense_attachment"
+                ]
+              },
+              "sourceRefs": [
+                {
+                  "entityType": "feature",
+                  "entityId": "feature_expense_submit"
+                }
+              ]
+            }
+          },
+          "order": [
+            "module_expense_form"
+          ]
+        },
+        "actions": {
+          "byId": {
+            "action_submit_expense": {
+              "id": "action_submit_expense",
+              "name": "提交审批",
+              "type": "submit",
+              "placement": "form_footer",
+              "triggerComponent": "button",
+              "priority": "P0",
+              "permissionRuleIds": [
+                "permission_employee_submit_expense"
+              ],
+              "sourceRefs": [
+                {
+                  "entityType": "feature",
+                  "entityId": "feature_expense_approval"
+                }
+              ]
+            }
+          },
+          "order": [
+            "action_submit_expense"
+          ]
+        },
+        "uiStates": {
+          "byId": {
+            "ui_state_expense_error": {
+              "id": "ui_state_expense_error",
+              "type": "error",
+              "name": "异常态",
+              "description": "报销单加载失败"
+            }
+          },
+          "order": [
+            "ui_state_expense_error"
+          ]
+        },
+        "roleVisibility": [
+          {
+            "roleId": "role_employee",
+            "visible": true
+          },
+          {
+            "roleId": "role_manager",
+            "visible": true
+          },
+          {
+            "roleId": "role_finance",
+            "visible": true
+          },
+          {
+            "roleId": "role_admin",
+            "visible": true
+          }
+        ],
+        "sourceRefs": [
+          {
+            "entityType": "feature",
+            "entityId": "feature_expense_submit"
+          }
+        ]
+      },
+      "page_expense_approval": {
+        "id": "page_expense_approval",
+        "name": "审批处理页",
+        "type": "approval",
+        "goal": "主管或财务审批报销单",
+        "routePath": "/expenses/:id/approval",
+        "layout": {
+          "layoutType": "top_nav_content",
+          "density": "compact",
+          "primaryRegion": "content",
+          "secondaryRegions": []
+        },
+        "modules": {
+          "byId": {
+            "module_expense_approval_panel": {
+              "id": "module_expense_approval_panel",
+              "name": "审批面板",
+              "type": "approval_panel",
+              "fields": {
+                "byId": {
+                  "field_expense_amount": {
+                    "id": "field_expense_amount",
+                    "name": "报销金额",
+                    "fieldKey": "amount",
+                    "type": "money",
+                    "required": true
+                  },
+                  "field_expense_reason": {
+                    "id": "field_expense_reason",
+                    "name": "报销事由",
+                    "fieldKey": "reason",
+                    "type": "textarea",
+                    "required": true
+                  },
+                  "field_expense_status": {
+                    "id": "field_expense_status",
+                    "name": "审批状态",
+                    "fieldKey": "status",
+                    "type": "status",
+                    "required": true
+                  }
+                },
+                "order": [
+                  "field_expense_amount",
+                  "field_expense_reason",
+                  "field_expense_status"
+                ]
+              },
+              "sourceRefs": [
+                {
+                  "entityType": "feature",
+                  "entityId": "feature_expense_approval"
+                }
+              ]
+            }
+          },
+          "order": [
+            "module_expense_approval_panel"
+          ]
+        },
+        "actions": {
+          "byId": {
+            "action_approve_expense": {
+              "id": "action_approve_expense",
+              "name": "审批通过",
+              "type": "approve",
+              "placement": "form_footer",
+              "triggerComponent": "button",
+              "priority": "P0",
+              "permissionRuleIds": [
+                "permission_manager_approve_expense",
+                "permission_finance_approve_expense"
+              ],
+              "sourceRefs": [
+                {
+                  "entityType": "feature",
+                  "entityId": "feature_expense_approval"
+                }
+              ]
+            },
+            "action_reject_expense": {
+              "id": "action_reject_expense",
+              "name": "驳回",
+              "type": "reject",
+              "placement": "form_footer",
+              "triggerComponent": "button",
+              "priority": "P0",
+              "permissionRuleIds": [
+                "permission_manager_reject_expense",
+                "permission_finance_reject_expense"
+              ],
+              "sourceRefs": [
+                {
+                  "entityType": "feature",
+                  "entityId": "feature_expense_approval"
+                }
+              ]
+            }
+          },
+          "order": [
+            "action_approve_expense",
+            "action_reject_expense"
+          ]
+        },
+        "uiStates": {
+          "byId": {
+            "ui_state_expense_no_permission": {
+              "id": "ui_state_expense_no_permission",
+              "type": "no_permission",
+              "name": "无权限态",
+              "description": "当前角色无权访问该页面或操作"
+            }
+          },
+          "order": [
+            "ui_state_expense_no_permission"
+          ]
+        },
+        "roleVisibility": [
+          {
+            "roleId": "role_employee",
+            "visible": true
+          },
+          {
+            "roleId": "role_manager",
+            "visible": true
+          },
+          {
+            "roleId": "role_finance",
+            "visible": true
+          },
+          {
+            "roleId": "role_admin",
+            "visible": true
+          }
+        ],
+        "sourceRefs": [
+          {
+            "entityType": "feature",
+            "entityId": "feature_expense_approval"
+          }
+        ]
+      },
+      "page_expense_log": {
+        "id": "page_expense_log",
+        "name": "审批日志页",
+        "type": "log",
+        "goal": "查看完整审批日志",
+        "routePath": "/expenses/:id/logs",
+        "layout": {
+          "layoutType": "top_nav_content",
+          "density": "compact",
+          "primaryRegion": "content",
+          "secondaryRegions": []
+        },
+        "modules": {
+          "byId": {
+            "module_expense_log": {
+              "id": "module_expense_log",
+              "name": "审批日志",
+              "type": "log_timeline",
+              "fields": {
+                "byId": {
+                  "field_expense_status": {
+                    "id": "field_expense_status",
+                    "name": "审批状态",
+                    "fieldKey": "status",
+                    "type": "status",
+                    "required": true
+                  }
+                },
+                "order": [
+                  "field_expense_status"
+                ]
+              },
+              "sourceRefs": [
+                {
+                  "entityType": "feature",
+                  "entityId": "feature_expense_submit"
+                }
+              ]
+            }
+          },
+          "order": [
+            "module_expense_log"
+          ]
+        },
+        "actions": {
+          "byId": {},
+          "order": []
+        },
+        "uiStates": {
+          "byId": {},
+          "order": []
+        },
+        "roleVisibility": [
+          {
+            "roleId": "role_employee",
+            "visible": true
+          },
+          {
+            "roleId": "role_manager",
+            "visible": true
+          },
+          {
+            "roleId": "role_finance",
+            "visible": true
+          },
+          {
+            "roleId": "role_admin",
+            "visible": true
+          }
+        ],
+        "sourceRefs": [
+          {
+            "entityType": "feature",
+            "entityId": "feature_expense_approval"
+          }
+        ]
+      }
+    },
+    "order": [
+      "page_expense_list",
+      "page_expense_detail",
+      "page_expense_create",
+      "page_expense_approval",
+      "page_expense_log"
+    ]
+  },
+  "navigation": {
+    "byId": {
+      "navigation_list_to_create": {
+        "id": "navigation_list_to_create",
+        "fromPageId": "page_expense_list",
+        "toPageId": "page_expense_create",
+        "triggerActionId": "action_create_expense",
+        "description": "点击新建进入新建报销单页"
+      },
+      "navigation_list_to_detail": {
+        "id": "navigation_list_to_detail",
+        "fromPageId": "page_expense_list",
+        "toPageId": "page_expense_detail",
+        "triggerActionId": "action_view_expense_detail",
+        "description": "点击查看详情进入报销详情"
+      },
+      "navigation_detail_to_log": {
+        "id": "navigation_detail_to_log",
+        "fromPageId": "page_expense_detail",
+        "toPageId": "page_expense_log",
+        "description": "从详情页查看审批日志"
+      }
+    },
+    "order": [
+      "navigation_list_to_create",
+      "navigation_list_to_detail",
+      "navigation_detail_to_log"
+    ]
+  },
+  "permissions": {
+    "byId": {
+      "permission_employee_create_expense": {
+        "id": "permission_employee_create_expense",
+        "roleId": "role_employee",
+        "targetType": "action",
+        "targetId": "action_create_expense",
+        "effect": "allow",
+        "dataScope": "self",
+        "reason": "员工可以新建自己的报销单"
+      },
+      "permission_employee_submit_expense": {
+        "id": "permission_employee_submit_expense",
+        "roleId": "role_employee",
+        "targetType": "action",
+        "targetId": "action_submit_expense",
+        "effect": "allow",
+        "dataScope": "self",
+        "reason": "员工可以提交自己的报销单"
+      },
+      "permission_employee_withdraw_expense": {
+        "id": "permission_employee_withdraw_expense",
+        "roleId": "role_employee",
+        "targetType": "action",
+        "targetId": "action_withdraw_expense",
+        "effect": "allow",
+        "dataScope": "self",
+        "reason": "员工可以撤回自己的草稿或待审批报销单"
+      },
+      "permission_manager_approve_expense": {
+        "id": "permission_manager_approve_expense",
+        "roleId": "role_manager",
+        "targetType": "action",
+        "targetId": "action_approve_expense",
+        "effect": "allow",
+        "dataScope": "department",
+        "reason": "主管审批负责员工的报销单"
+      },
+      "permission_manager_reject_expense": {
+        "id": "permission_manager_reject_expense",
+        "roleId": "role_manager",
+        "targetType": "action",
+        "targetId": "action_reject_expense",
+        "effect": "allow",
+        "dataScope": "department",
+        "reason": "主管可以驳回负责员工的报销单"
+      },
+      "permission_finance_approve_expense": {
+        "id": "permission_finance_approve_expense",
+        "roleId": "role_finance",
+        "targetType": "action",
+        "targetId": "action_approve_expense",
+        "effect": "allow",
+        "dataScope": "all",
+        "reason": "财务复核主管已通过的报销单"
+      },
+      "permission_finance_reject_expense": {
+        "id": "permission_finance_reject_expense",
+        "roleId": "role_finance",
+        "targetType": "action",
+        "targetId": "action_reject_expense",
+        "effect": "allow",
+        "dataScope": "all",
+        "reason": "财务可以驳回复核中的报销单"
+      },
+      "permission_admin_export_expense": {
+        "id": "permission_admin_export_expense",
+        "roleId": "role_admin",
+        "targetType": "action",
+        "targetId": "action_export_expense",
+        "effect": "allow",
+        "dataScope": "all",
+        "reason": "管理员可以导出全部报销单"
+      },
+      "permission_employee_view_own_expense": {
+        "id": "permission_employee_view_own_expense",
+        "roleId": "role_employee",
+        "targetType": "data",
+        "targetId": "object_expense_report",
+        "effect": "allow",
+        "dataScope": "self",
+        "reason": "员工只能查看自己的报销单"
+      },
+      "permission_admin_view_all_expense": {
+        "id": "permission_admin_view_all_expense",
+        "roleId": "role_admin",
+        "targetType": "data",
+        "targetId": "object_expense_report",
+        "effect": "allow",
+        "dataScope": "all",
+        "reason": "管理员可以查看全部报销单"
+      }
+    },
+    "order": [
+      "permission_employee_create_expense",
+      "permission_employee_submit_expense",
+      "permission_employee_withdraw_expense",
+      "permission_manager_approve_expense",
+      "permission_manager_reject_expense",
+      "permission_finance_approve_expense",
+      "permission_finance_reject_expense",
+      "permission_admin_export_expense",
+      "permission_employee_view_own_expense",
+      "permission_admin_view_all_expense"
+    ]
+  },
+  "mockDataSets": {
+    "byId": {
+      "mock_expense_reports": {
+        "id": "mock_expense_reports",
+        "name": "报销单列表样例",
+        "targetPageId": "page_expense_list",
+        "records": [
+          {
+            "applicant": "张三",
+            "amount": 1280,
+            "status": "待主管审批"
+          },
+          {
+            "applicant": "李四",
+            "amount": 360,
+            "status": "已完成"
+          }
+        ]
+      }
+    },
+    "order": [
+      "mock_expense_reports"
+    ]
+  }
+}
