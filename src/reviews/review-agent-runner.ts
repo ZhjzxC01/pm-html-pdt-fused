@@ -5,11 +5,13 @@ import { PromptRegistry } from "../llm/prompt-registry.js";
 import { PromptRunner } from "../llm/prompt-runner.js";
 import { parseStructuredOutput } from "../llm/structured-output-parser.js";
 import type { ValidationIssue } from "../types/index.js";
-import { roleVerdictSchema, type ReviewAgentResult, type ReviewRoleConfig } from "./review-types.js";
+import { roleVerdictSchema, type ReviewAgentResult, type ReviewFinding, type ReviewRoleConfig } from "./review-types.js";
 
 export interface ReviewAgentOptions {
   provider?: LLMProvider;
   promptDir?: string;
+  previousFindings?: ReviewFinding[];
+  roundNumber?: number;
 }
 
 export async function runReviewAgent(
@@ -24,10 +26,23 @@ export async function runReviewAgent(
 
   const promptName = `review-${role.roleId}`;
   const gateLabel = `[Review Gate: ${gate} Role: ${role.roleId}]`;
+  const roundLabel = options.roundNumber ? ` (第${options.roundNumber}轮审查)` : "";
+
+  let contextualInput = `${gateLabel}${roundLabel}\n\n${input}`;
+
+  // Inject previous findings for history awareness
+  if (options.previousFindings && options.previousFindings.length > 0) {
+    const round = (options.roundNumber ?? 2) - 1;
+    const findingsBlock = options.previousFindings
+      .map((f, i) => `${i + 1}. [${f.severity}][${f.category}] ${f.description}`)
+      .join("\n");
+    contextualInput += `\n\n## 上一轮审查发现（第${round}轮）\n\n${findingsBlock}\n\n请验证以上问题是否已修复。未修复的 critical 保持 critical，未修复的 warning 升级为 critical。已修复的不再重复报告。`;
+  }
+
   const response = await runner.run({
     systemPromptName: role.systemPromptName,
     promptName,
-    userInput: `${gateLabel}\n\n${input}`
+    userInput: contextualInput
   });
 
   const parsed = parseStructuredOutput(response.content);

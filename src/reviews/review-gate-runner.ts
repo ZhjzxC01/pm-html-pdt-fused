@@ -62,15 +62,88 @@ function formatFindingsToGuidance(gate: string, verdicts: RoleVerdict[], failedI
   ];
   if (allFindings.length === 0) return "";
 
-  const lines = [`[审查关口: ${gate}] 多角色审查发现 ${allFindings.length} 条反馈：`];
+  // Deduplicate findings with similar descriptions (>80% overlap in key terms)
+  const deduped = deduplicateFindings(allFindings);
 
-  for (const finding of allFindings) {
-    const prefix = finding.severity === "critical" ? "[必须修复]" : finding.severity === "warning" ? "[建议修复]" : "[优化建议]";
-    lines.push(`${prefix} ${finding.description}`);
-    if (finding.suggestedAction) {
-      lines.push(`  建议：${finding.suggestedAction}`);
+  // Sort by severity: critical > warning > suggestion
+  const severityOrder: Record<string, number> = { critical: 0, warning: 1, suggestion: 2 };
+  deduped.sort((a, b) => (severityOrder[a.severity] ?? 3) - (severityOrder[b.severity] ?? 3));
+
+  const criticalCount = deduped.filter((f) => f.severity === "critical").length;
+  const warningCount = deduped.filter((f) => f.severity === "warning").length;
+  const suggestionCount = deduped.filter((f) => f.severity === "suggestion").length;
+
+  const lines = [
+    `[审查关口: ${gate}] 多角色审查发现 ${deduped.length} 条反馈（${criticalCount} critical / ${warningCount} warning / ${suggestionCount} suggestion）：`,
+    ""
+  ];
+
+  // Group by severity for readability
+  if (criticalCount > 0) {
+    lines.push("### 必须修复（critical）");
+    for (const f of deduped.filter((f) => f.severity === "critical")) {
+      lines.push(`- [${f.category}] ${f.description}`);
+      if (f.suggestedAction) lines.push(`  建议：${f.suggestedAction}`);
+    }
+    lines.push("");
+  }
+
+  if (warningCount > 0) {
+    lines.push("### 建议修复（warning）");
+    for (const f of deduped.filter((f) => f.severity === "warning")) {
+      lines.push(`- [${f.category}] ${f.description}`);
+      if (f.suggestedAction) lines.push(`  建议：${f.suggestedAction}`);
+    }
+    lines.push("");
+  }
+
+  if (suggestionCount > 0) {
+    lines.push("### 优化建议（suggestion）");
+    for (const f of deduped.filter((f) => f.severity === "suggestion")) {
+      lines.push(`- [${f.category}] ${f.description}`);
+      if (f.suggestedAction) lines.push(`  建议：${f.suggestedAction}`);
     }
   }
 
   return lines.join("\n");
+}
+
+/** Deduplicate findings that are substantially similar across different reviewers. */
+function deduplicateFindings(findings: ReviewFinding[]): ReviewFinding[] {
+  const result: ReviewFinding[] = [];
+  for (const f of findings) {
+    const normalizedDesc = f.description.toLowerCase().replace(/\s+/g, " ").trim();
+    const isDuplicate = result.some((existing) => {
+      const existingDesc = existing.description.toLowerCase().replace(/\s+/g, " ").trim();
+      // Check for high overlap: same category + similar description content
+      if (existing.category !== f.category) return false;
+      // Simple containment check: if one description contains 60%+ of the other's key words
+      const existingWords = new Set(existingDesc.split(" ").filter((w) => w.length > 2));
+      const newWords = normalizedDesc.split(" ").filter((w) => w.length > 2);
+      if (newWords.length === 0) return false;
+      const overlap = newWords.filter((w) => existingWords.has(w)).length / newWords.length;
+      return overlap > 0.6;
+    });
+    if (!isDuplicate) {
+      result.push(f);
+    } else {
+      // If duplicate but higher severity, upgrade the existing one
+      const existingIndex = result.findIndex((existing) => {
+        const existingDesc = existing.description.toLowerCase().replace(/\s+/g, " ").trim();
+        if (existing.category !== f.category) return false;
+        const existingWords = new Set(existingDesc.split(" ").filter((w) => w.length > 2));
+        const newWords = normalizedDesc.split(" ").filter((w) => w.length > 2);
+        if (newWords.length === 0) return false;
+        const overlap = newWords.filter((w) => existingWords.has(w)).length / newWords.length;
+        return overlap > 0.6;
+      });
+      if (existingIndex >= 0) {
+        const severityRank: Record<string, number> = { critical: 0, warning: 1, suggestion: 2 };
+        if ((severityRank[f.severity] ?? 3) < (severityRank[result[existingIndex].severity] ?? 3)) {
+          result[existingIndex] = { ...result[existingIndex], severity: f.severity };
+        }
+      }
+    }
+  }
+  return result;
 }

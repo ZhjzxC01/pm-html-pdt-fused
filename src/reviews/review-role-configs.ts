@@ -55,14 +55,14 @@ export const REVIEW_GATES: ReviewGateConfig[] = [
   {
     gate: "gate_2_requirements",
     name: "需求结构审查",
-    description: "对结构化需求和复杂度评估进行完整性和质量审查",
-    roleIds: ["business-analyst", "qa-engineer"]
+    description: "对结构化需求和复杂度评估进行完整性、架构和质量审查",
+    roleIds: ["business-analyst", "tech-architect", "qa-engineer"]
   },
   {
     gate: "gate_3_prototype",
     name: "原型结构审查",
-    description: "对原型规格、流程规格进行交互、视觉和架构审查",
-    roleIds: ["ux-designer", "ui-designer", "tech-architect"]
+    description: "对原型规格、流程规格进行业务覆盖、交互、视觉和架构审查",
+    roleIds: ["business-analyst", "ux-designer", "ui-designer", "tech-architect"]
   },
   {
     gate: "gate_4_html_testcase",
@@ -73,8 +73,8 @@ export const REVIEW_GATES: ReviewGateConfig[] = [
   {
     gate: "gate_5_prd",
     name: "PRD 审查",
-    description: "对 PRD 追溯完整性和技术约束进行审查",
-    roleIds: ["business-analyst", "tech-architect"]
+    description: "对 PRD 追溯完整性、技术约束和验收标准可测试性进行审查",
+    roleIds: ["business-analyst", "tech-architect", "qa-engineer"]
   }
 ];
 

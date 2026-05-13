@@ -1,12 +1,13 @@
-import path from "node:path";
-import { applyPatchEnvelope } from "../state/patch-manager.js";
-import { loadProjectState, saveProjectState } from "../state/project-state-manager.js";
-import type { ProjectState, StateArtifactType, ValidationIssue } from "../types/index.js";
+import { runPrototypeAnnotationAgent } from "../agents/prototype-annotation-agent.js";
 import { renderAndCommit } from "./render-pipeline.js";
+import type { LLMProvider } from "../llm/llm-provider.js";
 
 const annotationPrerequisites: StateArtifactType[] = ["htmlPrototype", "prototypeMeta", "prdSpec", "testCaseSpec"];
 
-export async function annotateProjectFile(projectPath: string): Promise<{ ok: true } | { ok: false; issues: ValidationIssue[] }> {
+export async function annotateProjectFile(
+  projectPath: string,
+  options: { llmProvider?: LLMProvider } = {}
+): Promise<{ ok: true } | { ok: false; issues: ValidationIssue[] }> {
   const state = await loadProjectState(projectPath);
   const dirty = annotationPrerequisites.filter((artifact) => state.dirtyArtifacts.includes(artifact));
   if (dirty.length > 0) {
@@ -23,30 +24,34 @@ export async function annotateProjectFile(projectPath: string): Promise<{ ok: tr
     };
   }
 
-  if (!state.prototypeAnnotationSpec) {
-    return {
-      ok: false,
-      issues: [
-        {
-          id: "issue_missing_prototype_annotation_spec",
-          severity: "error",
-          code: "missing_prototype_annotation_spec",
-          message: "缺少原型标注结构，当前规则版首轮需要先运行 generate。"
-        }
-      ]
-    };
+  // Prepare context for LLM
+  const context = {
+    prdSpec: state.prdSpec,
+    htmlPrototype: state.htmlPrototype,
+    prototypeSpec: state.prototypeSpec,
+    testCaseSpec: state.testCaseSpec,
+    existingAnnotationSpec: state.prototypeAnnotationSpec || null,
+    isIncremental: !!state.prototypeAnnotationSpec
+  };
+
+  const input = JSON.stringify(context);
+  const annotationResult = await runPrototypeAnnotationAgent(input, { provider: options.llmProvider });
+
+  if (!annotationResult.ok) {
+    return { ok: false, issues: annotationResult.issues };
   }
 
-  // Reverse write: write annotationNumber to PRD sections
-  const stateWithReverseWrite = reverseWriteAnnotationNumbers(state);
+  const step = annotationResult.step;
 
-  const patched = applyPatchEnvelope(stateWithReverseWrite, {
+
+  const patches = [...step.patches];
+  const patched = applyPatchEnvelope(state, {
     id: `patch_annotation_${Date.now()}`,
-    projectId: stateWithReverseWrite.id,
-    baseVersion: stateWithReverseWrite.version,
+    projectId: state.id,
+    baseVersion: state.version,
     source: "prototype_annotation_generation",
-    reason: "刷新原型 PRD 标注结构",
-    patches: [{ op: "replace", path: "/prototypeAnnotationSpec", value: stateWithReverseWrite.prototypeAnnotationSpec }],
+    reason: state.prototypeAnnotationSpec ? "增量更新原型 PRD 标注结构" : "初始化原型 PRD 标注结构",
+    patches,
     transaction: { atomic: true, mode: "all_or_nothing" },
     dirtyPolicy: { clear: ["prototypeAnnotationSpec"], mark: ["issues"], useDependencyPropagation: true },
     validationProfile: "generation_annotation"
@@ -56,7 +61,11 @@ export async function annotateProjectFile(projectPath: string): Promise<{ ok: tr
     return { ok: false, issues: patched.issues };
   }
 
-  const rendered = await renderAndCommit(patched.state, path.dirname(projectPath), [
+  // Reverse write: write annotationNumber to PRD sections
+  const stateWithReverseWrite = reverseWriteAnnotationNumbers(patched.state);
+
+  const rendered = await renderAndCommit(stateWithReverseWrite, path.dirname(projectPath), [
+    "prd_markdown",
     "prototype_annotation_json",
     "prototype_review_html"
   ]);

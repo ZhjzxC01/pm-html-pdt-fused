@@ -16,22 +16,24 @@ describe("审查关口运行器", () => {
     expect(typeof result.guidance).toBe("string");
   });
 
-  it("gate_2 只运行 business-analyst 和 qa-engineer", async () => {
+  it("gate_2 运行 business-analyst、tech-architect 和 qa-engineer", async () => {
     const result = await runReviewGate("gate_2_requirements", "测试需求");
 
     expect(result.gate).toBe("gate_2_requirements");
-    expect(result.roleVerdicts.length).toBe(2);
+    expect(result.roleVerdicts.length).toBe(3);
     const roleIds = result.roleVerdicts.map((v) => v.roleId);
     expect(roleIds).toContain("business-analyst");
+    expect(roleIds).toContain("tech-architect");
     expect(roleIds).toContain("qa-engineer");
   });
 
-  it("gate_3 运行 ux-designer、ui-designer 和 tech-architect", async () => {
+  it("gate_3 运行 business-analyst、ux-designer、ui-designer 和 tech-architect", async () => {
     const result = await runReviewGate("gate_3_prototype", "测试需求");
 
     expect(result.gate).toBe("gate_3_prototype");
-    expect(result.roleVerdicts.length).toBe(3);
+    expect(result.roleVerdicts.length).toBe(4);
     const roleIds = result.roleVerdicts.map((v) => v.roleId);
+    expect(roleIds).toContain("business-analyst");
     expect(roleIds).toContain("ux-designer");
     expect(roleIds).toContain("ui-designer");
     expect(roleIds).toContain("tech-architect");

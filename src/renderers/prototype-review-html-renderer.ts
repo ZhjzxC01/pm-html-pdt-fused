@@ -250,30 +250,13 @@ function buildScript(): string {
     if (!tooltip) return;
 
     badge.addEventListener('mouseenter', function() {
+      // Show tooltip on hover (multiple different tooltips can be open simultaneously)
       tooltip.style.display = 'block';
       positionTooltip(tooltip, badge);
     });
-
-    badge.addEventListener('mouseleave', function(e) {
-      // Check if mouse moved to the tooltip itself
-      var related = e.relatedTarget;
-      if (related && (related === tooltip || tooltip.contains(related))) return;
-      // Don't hide — user might want to interact with tooltip
-    });
   });
 
-  // --- Tooltip mouse leave to hide ---
-  document.querySelectorAll('.prd-tooltip').forEach(function(tooltip) {
-    tooltip.addEventListener('mouseleave', function(e) {
-      var related = e.relatedTarget;
-      var annotationId = tooltip.getAttribute('data-tooltip-for');
-      var badge = document.querySelector('[data-annotation-badge="' + annotationId + '"]');
-      if (related && (related === badge || (badge && badge.contains(related)))) return;
-      tooltip.style.display = 'none';
-    });
-  });
-
-  // --- Close button ---
+  // --- Close button (ONLY way to close a tooltip) ---
   document.querySelectorAll('[data-tooltip-close]').forEach(function(btn) {
     btn.addEventListener('click', function(e) {
       e.stopPropagation();
@@ -293,13 +276,14 @@ function buildScript(): string {
     });
   });
 
-  // --- Drag to move ---
+  // --- Drag to move (via header area) ---
   document.querySelectorAll('.prd-tooltip').forEach(function(tooltip) {
     var isDragging = false;
     var startX, startY, startLeft, startTop;
 
     var header = tooltip.querySelector('.prd-tooltip-header');
     if (!header) return;
+    header.style.cursor = 'move';
 
     header.addEventListener('mousedown', function(e) {
       if (e.target.closest('.prd-tooltip-close')) return;

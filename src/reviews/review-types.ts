@@ -13,6 +13,7 @@ export const reviewFindingSchema = z.object({
 export const roleVerdictSchema = z.object({
   roleId: z.string().min(1),
   gate: z.string().min(1),
+  reasoning: z.string().optional(),
   approved: z.boolean(),
   findings: z.array(reviewFindingSchema),
   summary: z.string().min(1)
