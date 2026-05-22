@@ -108,34 +108,36 @@ function formatFindingsToGuidance(gate: string, verdicts: RoleVerdict[], failedI
   return lines.join("\n");
 }
 
+/** CJK-aware tokenizer: splits on whitespace and between CJK characters, keeping Latin words intact. */
+function tokenizeForOverlap(text: string): string[] {
+  return text
+    .toLowerCase()
+    .split(/\s+|(?=[一-鿿㐀-䶿])|(?<=[一-鿿㐀-䶿])/)
+    .filter((t) => t.length > 0);
+}
+
+function computeWordOverlap(a: string[], b: Set<string>): number {
+  if (a.length === 0) return 0;
+  return a.filter((w) => b.has(w)).length / a.length;
+}
+
 /** Deduplicate findings that are substantially similar across different reviewers. */
 function deduplicateFindings(findings: ReviewFinding[]): ReviewFinding[] {
   const result: ReviewFinding[] = [];
   for (const f of findings) {
-    const normalizedDesc = f.description.toLowerCase().replace(/\s+/g, " ").trim();
+    const newTokens = tokenizeForOverlap(f.description).filter((w) => w.length > 1 || /[一-鿿]/.test(w));
     const isDuplicate = result.some((existing) => {
-      const existingDesc = existing.description.toLowerCase().replace(/\s+/g, " ").trim();
-      // Check for high overlap: same category + similar description content
       if (existing.category !== f.category) return false;
-      // Simple containment check: if one description contains 60%+ of the other's key words
-      const existingWords = new Set(existingDesc.split(" ").filter((w) => w.length > 2));
-      const newWords = normalizedDesc.split(" ").filter((w) => w.length > 2);
-      if (newWords.length === 0) return false;
-      const overlap = newWords.filter((w) => existingWords.has(w)).length / newWords.length;
-      return overlap > 0.6;
+      const existingTokens = new Set(tokenizeForOverlap(existing.description).filter((w) => w.length > 1 || /[一-鿿]/.test(w)));
+      return computeWordOverlap(newTokens, existingTokens) > 0.6;
     });
     if (!isDuplicate) {
       result.push(f);
     } else {
-      // If duplicate but higher severity, upgrade the existing one
       const existingIndex = result.findIndex((existing) => {
-        const existingDesc = existing.description.toLowerCase().replace(/\s+/g, " ").trim();
         if (existing.category !== f.category) return false;
-        const existingWords = new Set(existingDesc.split(" ").filter((w) => w.length > 2));
-        const newWords = normalizedDesc.split(" ").filter((w) => w.length > 2);
-        if (newWords.length === 0) return false;
-        const overlap = newWords.filter((w) => existingWords.has(w)).length / newWords.length;
-        return overlap > 0.6;
+        const existingTokens = new Set(tokenizeForOverlap(existing.description).filter((w) => w.length > 1 || /[一-鿿]/.test(w)));
+        return computeWordOverlap(newTokens, existingTokens) > 0.6;
       });
       if (existingIndex >= 0) {
         const severityRank: Record<string, number> = { critical: 0, warning: 1, suggestion: 2 };

@@ -1,7 +1,9 @@
 import type { z } from "zod";
 import type {
+  activatePathStepSchema,
   artifactManifestItemSchema,
   artifactManifestSchema,
+  backlogItemSchema,
   businessObjectSchema,
   changeLogItemSchema,
   complexityAssessmentSchema,
@@ -71,6 +73,8 @@ export type FlowSpec = z.infer<typeof flowSpecSchema>;
 export type PRDSpec = z.infer<typeof prdSpecSchema>;
 export type TestCaseSpec = z.infer<typeof testCaseSpecSchema>;
 export type PrototypeAnnotationSpec = z.infer<typeof prototypeAnnotationSpecSchema>;
+export type ActivatePathStep = z.infer<typeof activatePathStepSchema>;
+export type BacklogItem = z.infer<typeof backlogItemSchema>;
 export type ArtifactManifest = z.infer<typeof artifactManifestSchema>;
 export type ArtifactManifestItem = z.infer<typeof artifactManifestItemSchema>;
 export type PatchSource = z.infer<typeof patchSourceSchema>;

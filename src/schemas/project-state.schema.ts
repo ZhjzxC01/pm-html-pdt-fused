@@ -554,6 +554,12 @@ export const annotationPositionSchema = z.object({
   offsetY: z.number()
 });
 
+export const activatePathStepSchema = z.object({
+  action: z.enum(["click", "scroll", "tab_switch", "wait"]),
+  selector: z.string(),
+  description: z.string().optional()
+});
+
 export const prototypeAnnotationSchema = z.object({
   id: z.string().min(1),
   annotationNumber: z.number().int().min(1).max(999),
@@ -564,7 +570,9 @@ export const prototypeAnnotationSchema = z.object({
   tooltipSections: z.array(tooltipSectionSchema),
   relatedEntities: z.array(relatedEntitySchema),
   position: annotationPositionSchema.optional(),
-  severity: severitySchema
+  severity: severitySchema,
+  annotationLevel: z.enum(["page", "module", "component", "action"]).optional(),
+  activatePath: z.array(activatePathStepSchema).optional()
 });
 
 export const prototypeAnnotationBrokenLinkSchema = z.object({
@@ -704,6 +712,15 @@ export const consistencyIssueSchema = z.object({
   fixSuggestion: z.string().optional()
 });
 
+export const backlogItemSchema = z.object({
+  id: z.string().min(1),
+  featureId: z.string(),
+  name: z.string(),
+  group: z.enum(["mvp", "enhancement", "deferred", "excluded"]),
+  priority: prioritySchema,
+  reason: z.string().optional()
+});
+
 export const projectStateSchema = z.object({
   id: z.string().min(1),
   name: z.string(),
@@ -712,15 +729,13 @@ export const projectStateSchema = z.object({
   updatedAt: z.string(),
   lifecycleStatus: z.enum([
     "draft",
-    "requirement_ready",
-    "prototype_ready",
-    "html_ready",
-    "flow_ready",
-    "prd_ready",
-    "test_ready",
-    "annotated_ready",
-    "validated",
-    "dirty"
+    "feature_list_done",
+    "complexity_assessed",
+    "prototype_done",
+    "prd_done",
+    "annotation_done",
+    "consistency_checked",
+    "delivered"
   ]),
   requirementCard: requirementCardSchema.nullable(),
   prototypeSpec: prototypeSpecSchema.nullable(),
@@ -736,7 +751,9 @@ export const projectStateSchema = z.object({
   issues: z.array(consistencyIssueSchema),
   changeLog: z.array(changeLogItemSchema),
   dirtyArtifacts: z.array(stateArtifactTypeSchema),
-  lastStructuredGeneratedAt: z.record(z.string(), z.string())
+  lastStructuredGeneratedAt: z.record(z.string(), z.string()),
+  backlog: z.array(backlogItemSchema).optional(),
+  rawMaterialsProcessed: z.array(z.string()).optional()
 });
 
 export const renderResultSchema = z.object({

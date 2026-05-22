@@ -241,28 +241,33 @@ function stripQuotes(value: string): string {
   return value.replace(/[\u201c\u201d\u2018\u2019"]/g, "").trim();
 }
 
-function mapFieldType(raw: string): SemanticAction & { type: "change_field_type" } extends { newType: infer T } ? T : never {
-  const map: Record<string, string> = {
-    文本: "text", 单行文本: "text", 短文本: "text",
-    数字: "number", 数值: "number",
-    下拉: "select", 选择: "select", 枚举: "select",
-    日期: "date", 时间: "date",
-    多行文本: "textarea", 长文本: "textarea", 富文本: "textarea",
-    金额: "money", 货币: "money",
-    状态: "status",
-    用户: "user", 人员: "user",
-    文件: "file", 附件: "file"
-  };
-  return (map[raw] ?? null) as any;
+type FieldType = "text" | "number" | "select" | "date" | "textarea" | "money" | "status" | "user" | "file";
+
+const FIELD_TYPE_MAP: Record<string, FieldType> = {
+  文本: "text", 单行文本: "text", 短文本: "text",
+  数字: "number", 数值: "number",
+  下拉: "select", 选择: "select", 枚举: "select",
+  日期: "date", 时间: "date",
+  多行文本: "textarea", 长文本: "textarea", 富文本: "textarea",
+  金额: "money", 货币: "money",
+  状态: "status",
+  用户: "user", 人员: "user",
+  文件: "file", 附件: "file"
+};
+
+function mapFieldType(raw: string): FieldType | null {
+  return FIELD_TYPE_MAP[raw] ?? null;
 }
 
-function inferModuleType(instruction: string): SemanticAction & { type: "add_module_to_page" } extends { moduleType: infer T } ? T : never {
-  if (instruction.includes("审批")) return "approval_panel" as any;
-  if (instruction.includes("日志") || instruction.includes("记录")) return "log_timeline" as any;
-  if (instruction.includes("图表") || instruction.includes("统计")) return "chart" as any;
-  if (instruction.includes("汇总") || instruction.includes("摘要")) return "summary" as any;
-  if (instruction.includes("表单")) return "form" as any;
-  if (instruction.includes("列表") || instruction.includes("表格")) return "table" as any;
-  if (instruction.includes("筛选") || instruction.includes("过滤")) return "filter" as any;
-  return "detail_card" as any;
+type ModuleType = "filter" | "table" | "form" | "detail_card" | "approval_panel" | "log_timeline" | "chart" | "summary";
+
+function inferModuleType(instruction: string): ModuleType {
+  if (instruction.includes("审批")) return "approval_panel";
+  if (instruction.includes("日志") || instruction.includes("记录")) return "log_timeline";
+  if (instruction.includes("图表") || instruction.includes("统计")) return "chart";
+  if (instruction.includes("汇总") || instruction.includes("摘要")) return "summary";
+  if (instruction.includes("表单")) return "form";
+  if (instruction.includes("列表") || instruction.includes("表格")) return "table";
+  if (instruction.includes("筛选") || instruction.includes("过滤")) return "filter";
+  return "detail_card";
 }

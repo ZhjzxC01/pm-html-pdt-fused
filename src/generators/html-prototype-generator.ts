@@ -129,40 +129,88 @@ function extractInteractiveData(state: ProjectState): InteractiveData {
   return { pages, navigation, stateMachines, mockDataSets, actions, fields };
 }
 
-function buildDesignSystemCSS(): string {
-  return `/* Meridian Design System */
+export interface DesignSystemConfig {
+  colors: Record<string, string>;
+  fontHeading?: string;
+  fontBody?: string;
+}
+
+const DEFAULT_DESIGN_SYSTEM: DesignSystemConfig = {
+  colors: {
+    primary: "#2563EB",
+    "on-primary": "#FFFFFF",
+    "primary-container": "#DBEAFE",
+    "on-primary-container": "#1E3A5F",
+    secondary: "#0F172A",
+    "on-secondary": "#FFFFFF",
+    "secondary-container": "#1E293B",
+    "on-secondary-container": "#CBD5E1",
+    tertiary: "#0D9488",
+    "on-tertiary": "#FFFFFF",
+    "tertiary-container": "#CCFBF1",
+    "on-tertiary-container": "#134E4A",
+    error: "#DC2626",
+    "on-error": "#FFFFFF",
+    "error-container": "#FEE2E2",
+    "on-error-container": "#7F1D1D",
+    surface: "#FFFFFF",
+    "on-surface": "#0F172A",
+    "surface-dim": "#F8FAFC",
+    "surface-container-low": "#F8FAFC",
+    "surface-container": "#F1F5F9",
+    "surface-container-high": "#E2E8F0",
+    "surface-container-highest": "#CBD5E1",
+    "on-surface-variant": "#64748B",
+    outline: "#94A3B8",
+    "outline-variant": "#E2E8F0",
+    "inverse-surface": "#1E293B",
+    "inverse-on-surface": "#F1F5F9",
+    "inverse-primary": "#93C5FD",
+    background: "#F8FAFC",
+    "on-background": "#0F172A",
+  },
+  fontHeading: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+  fontBody: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+};
+
+function buildDesignSystemCSS(config?: DesignSystemConfig): string {
+  const ds = config ?? DEFAULT_DESIGN_SYSTEM;
+  const c = ds.colors;
+  const fh = ds.fontHeading ?? DEFAULT_DESIGN_SYSTEM.fontHeading!;
+  const fb = ds.fontBody ?? DEFAULT_DESIGN_SYSTEM.fontBody!;
+  return `/* Dynamic Design System */
 :root {
-  --color-primary: #2563EB;
-  --color-on-primary: #FFFFFF;
-  --color-primary-container: #DBEAFE;
-  --color-on-primary-container: #1E3A5F;
-  --color-secondary: #0F172A;
-  --color-on-secondary: #FFFFFF;
-  --color-secondary-container: #1E293B;
-  --color-on-secondary-container: #CBD5E1;
-  --color-tertiary: #0D9488;
-  --color-on-tertiary: #FFFFFF;
-  --color-tertiary-container: #CCFBF1;
-  --color-on-tertiary-container: #134E4A;
-  --color-error: #DC2626;
-  --color-on-error: #FFFFFF;
-  --color-error-container: #FEE2E2;
-  --color-on-error-container: #7F1D1D;
-  --color-surface: #FFFFFF;
-  --color-on-surface: #0F172A;
-  --color-surface-dim: #F8FAFC;
-  --color-surface-container-low: #F8FAFC;
-  --color-surface-container: #F1F5F9;
-  --color-surface-container-high: #E2E8F0;
-  --color-surface-container-highest: #CBD5E1;
-  --color-on-surface-variant: #64748B;
-  --color-outline: #94A3B8;
-  --color-outline-variant: #E2E8F0;
-  --color-inverse-surface: #1E293B;
-  --color-inverse-on-surface: #F1F5F9;
-  --color-inverse-primary: #93C5FD;
-  --color-background: #F8FAFC;
-  --color-on-background: #0F172A;
+  --color-primary: ${c.primary ?? "#2563EB"};
+  --color-on-primary: ${c["on-primary"] ?? "#FFFFFF"};
+  --color-primary-container: ${c["primary-container"] ?? "#DBEAFE"};
+  --color-on-primary-container: ${c["on-primary-container"] ?? "#1E3A5F"};
+  --color-secondary: ${c.secondary ?? "#0F172A"};
+  --color-on-secondary: ${c["on-secondary"] ?? "#FFFFFF"};
+  --color-secondary-container: ${c["secondary-container"] ?? "#1E293B"};
+  --color-on-secondary-container: ${c["on-secondary-container"] ?? "#CBD5E1"};
+  --color-tertiary: ${c.tertiary ?? "#0D9488"};
+  --color-on-tertiary: ${c["on-tertiary"] ?? "#FFFFFF"};
+  --color-tertiary-container: ${c["tertiary-container"] ?? "#CCFBF1"};
+  --color-on-tertiary-container: ${c["on-tertiary-container"] ?? "#134E4A"};
+  --color-error: ${c.error ?? "#DC2626"};
+  --color-on-error: ${c["on-error"] ?? "#FFFFFF"};
+  --color-error-container: ${c["error-container"] ?? "#FEE2E2"};
+  --color-on-error-container: ${c["on-error-container"] ?? "#7F1D1D"};
+  --color-surface: ${c.surface ?? "#FFFFFF"};
+  --color-on-surface: ${c["on-surface"] ?? "#0F172A"};
+  --color-surface-dim: ${c["surface-dim"] ?? "#F8FAFC"};
+  --color-surface-container-low: ${c["surface-container-low"] ?? "#F8FAFC"};
+  --color-surface-container: ${c["surface-container"] ?? "#F1F5F9"};
+  --color-surface-container-high: ${c["surface-container-high"] ?? "#E2E8F0"};
+  --color-surface-container-highest: ${c["surface-container-highest"] ?? "#CBD5E1"};
+  --color-on-surface-variant: ${c["on-surface-variant"] ?? "#64748B"};
+  --color-outline: ${c.outline ?? "#94A3B8"};
+  --color-outline-variant: ${c["outline-variant"] ?? "#E2E8F0"};
+  --color-inverse-surface: ${c["inverse-surface"] ?? "#1E293B"};
+  --color-inverse-on-surface: ${c["inverse-on-surface"] ?? "#F1F5F9"};
+  --color-inverse-primary: ${c["inverse-primary"] ?? "#93C5FD"};
+  --color-background: ${c.background ?? "#F8FAFC"};
+  --color-on-background: ${c["on-background"] ?? "#0F172A"};
   --shape-none: 0;
   --shape-sm: 4px;
   --shape-default: 6px;
@@ -179,14 +227,14 @@ function buildDesignSystemCSS(): string {
 *, *::before, *::after { box-sizing: border-box; }
 body {
   margin: 0;
-  font: 400 14px/22px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font: 400 14px/22px ${fb};
   letter-spacing: 0;
   color: var(--color-on-surface);
   background: var(--color-background);
 }
-h1 { font: 600 30px/38px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 0 0 20px; color: var(--color-on-surface); letter-spacing: -0.015em; }
-h2 { font: 600 24px/32px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 0 0 16px; color: var(--color-on-surface); letter-spacing: -0.01em; }
-h3 { font: 600 20px/28px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 0 0 12px; color: var(--color-on-surface); }
+h1 { font: 600 30px/38px ${fh}; margin: 0 0 20px; color: var(--color-on-surface); letter-spacing: -0.015em; }
+h2 { font: 600 24px/32px ${fh}; margin: 0 0 16px; color: var(--color-on-surface); letter-spacing: -0.01em; }
+h3 { font: 600 20px/28px ${fh}; margin: 0 0 12px; color: var(--color-on-surface); }
 header {
   height: 56px;
   display: flex;
@@ -194,7 +242,7 @@ header {
   padding: 0 24px;
   background: var(--color-surface);
   color: var(--color-on-surface);
-  font: 600 20px/28px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font: 600 20px/28px ${fh};
   border-bottom: 1px solid var(--color-outline-variant);
   position: relative;
   z-index: 10;
@@ -219,7 +267,7 @@ button, [role="button"] {
   background: var(--color-surface);
   color: var(--color-on-surface);
   padding: 0 20px;
-  font: 500 14px/20px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font: 500 14px/20px ${fh};
   letter-spacing: 0.01em;
   cursor: pointer;
   transition: box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease;
@@ -250,7 +298,7 @@ a[data-action-id] {
   background: transparent;
   color: var(--color-primary);
   padding: 0 16px;
-  font: 500 14px/38px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font: 500 14px/38px ${fh};
   letter-spacing: 0.01em;
   text-decoration: none;
   display: inline-flex;
@@ -266,7 +314,7 @@ a[data-action-id]:hover { background: var(--color-primary-container); border-col
 .field { display: flex; flex-direction: column; gap: 4px; }
 .field > span,
 .field > label {
-  font: 500 12px/16px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font: 500 12px/16px ${fh};
   letter-spacing: 0.02em;
   color: var(--color-on-surface-variant);
 }
@@ -280,7 +328,7 @@ a[data-action-id]:hover { background: var(--color-primary-container); border-col
   background: var(--color-surface);
   color: var(--color-on-surface);
   padding: 8px 12px;
-  font: 400 14px/22px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font: 400 14px/22px ${fb};
   letter-spacing: 0;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
   width: 100%;
@@ -303,7 +351,7 @@ a[data-action-id]:hover { background: var(--color-primary-container); border-col
 }
 .state, [data-ui-state-id] {
   color: var(--color-on-surface-variant);
-  font: 400 14px/22px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font: 400 14px/22px ${fb};
   letter-spacing: 0;
   padding: 16px;
   background: var(--color-surface-container);
@@ -315,7 +363,7 @@ table.mock-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 16px;
-  font: 400 14px/22px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font: 400 14px/22px ${fb};
   letter-spacing: 0;
 }
 table.mock-table thead th {
@@ -323,7 +371,7 @@ table.mock-table thead th {
   padding: 10px 16px;
   background: var(--color-surface-container-low);
   color: var(--color-on-surface-variant);
-  font: 500 12px/16px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font: 500 12px/16px ${fh};
   letter-spacing: 0.02em;
   border-bottom: 1px solid var(--color-outline-variant);
 }

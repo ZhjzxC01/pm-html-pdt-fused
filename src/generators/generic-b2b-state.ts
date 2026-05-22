@@ -3,6 +3,13 @@ import type { ProjectState } from "../types/index.js";
 import { matchDomain } from "./domains/registry.js";
 import type { DomainTemplate, DomainMatchResult } from "./domains/domain-template.js";
 
+type DomainFieldMap = Map<string, { name: string; fieldKey: string; type: string; required: boolean }>;
+
+function buildDomainFieldMap(domain: DomainTemplate | undefined): DomainFieldMap | undefined {
+  if (!domain) return undefined;
+  return new Map(domain.defaultFields.map((f) => [f.id, { name: f.name, fieldKey: f.fieldKey, type: f.type, required: f.required }]));
+}
+
 interface GenericContext {
   projectName: string;
   businessObject: string;
@@ -29,7 +36,7 @@ export function isExpenseApprovalInput(input: string): boolean {
 export function createGenericB2BProjectState(input: string, now = new Date().toISOString()): ProjectState {
   const context = inferGenericContext(input);
   const domain = context.domainMatch?.domain;
-  setDomainFieldMap(domain);
+  const domainFields = buildDomainFieldMap(domain);
   const state = createEmptyProjectState(context.projectName, now);
   const object = context.businessObject;
   const hasApproval = context.hasApproval;
@@ -110,11 +117,11 @@ export function createGenericB2BProjectState(input: string, now = new Date().toI
     ]
   };
 
-  state.prototypeSpec = createPrototypeSpec(context);
+  state.prototypeSpec = createPrototypeSpec(context, domainFields);
   state.flowSpec = createFlowSpec(context);
   state.htmlPrototype = createHtmlPrototype(context, now);
-  state.prototypeMeta = createPrototypeMeta(context);
-  state.prdSpec = createPrdSpec(context);
+  state.prototypeMeta = createPrototypeMeta(context, domainFields);
+  state.prdSpec = createPrdSpec(context, domainFields);
   state.testCaseSpec = createTestCaseSpec(context, now);
   state.prototypeAnnotationSpec = createAnnotationSpec(context, now);
   state.traceability.links = [
@@ -266,7 +273,7 @@ function completedStateName(context: GenericContext): string {
   return /已生效|生效/.test(context.sourceInput) ? "已生效" : context.hasApproval ? "已通过" : "已完成";
 }
 
-function createPrototypeSpec(context: GenericContext) {
+function createPrototypeSpec(context: GenericContext, domainFields?: DomainFieldMap) {
   const object = context.businessObject;
   const domain = context.domainMatch?.domain;
   const domainPagePattern = domain?.pagePatterns.find((p) => p.type === "list");
@@ -283,29 +290,29 @@ function createPrototypeSpec(context: GenericContext) {
   ];
   const processPage = context.hasApproval
     ? page("page_approval", `${object}审批处理页`, "approval", "/items/:id/approval", `处理${object}审批`, [
-        module("module_process_panel", "审批面板", "approval_panel", ["field_name", "field_status", "field_amount", "field_description", "field_attachment"])
+        module("module_process_panel", "审批面板", "approval_panel", ["field_name", "field_status", "field_amount", "field_description", "field_attachment"], domainFields)
       ], actionIds, ["ui_state_no_permission"], ["feature_process"], roleVisibility)
     : null;
 
   const listModules = domainPagePattern
-    ? domainPagePattern.modules.map((m) => module(m.id, m.name, m.type as "filter" | "table" | "form" | "detail_card" | "approval_panel" | "log_timeline", m.fieldIds))
+    ? domainPagePattern.modules.map((m) => module(m.id, m.name, m.type as "filter" | "table" | "form" | "detail_card" | "approval_panel" | "log_timeline", m.fieldIds, domainFields))
     : [
-        module("module_filter", "筛选区", "filter", ["field_code", "field_customer", "field_status", "field_amount", "field_owner", "field_current_node"]),
-        module("module_table", `${object}表格`, "table", ["field_code", "field_customer", "field_name", "field_amount", "field_owner", "field_status", "field_current_node"])
+        module("module_filter", "筛选区", "filter", ["field_code", "field_customer", "field_status", "field_amount", "field_owner", "field_current_node"], domainFields),
+        module("module_table", `${object}表格`, "table", ["field_code", "field_customer", "field_name", "field_amount", "field_owner", "field_status", "field_current_node"], domainFields)
       ];
   const listActionIds = domainPagePattern ? domainPagePattern.actionIds : ["action_create", "action_search", "action_reset", "action_export", "action_view_detail"];
 
   const detailModules = domainDetailPattern
-    ? domainDetailPattern.modules.map((m) => module(m.id, m.name, m.type as "filter" | "table" | "form" | "detail_card" | "approval_panel" | "log_timeline", m.fieldIds))
+    ? domainDetailPattern.modules.map((m) => module(m.id, m.name, m.type as "filter" | "table" | "form" | "detail_card" | "approval_panel" | "log_timeline", m.fieldIds, domainFields))
     : [
-        module("module_detail_card", `${object}详情`, "detail_card", ["field_code", "field_customer", "field_name", "field_amount", "field_owner", "field_status", "field_description", "field_attachment", "field_risk"]),
-        module("module_timeline", "状态记录", "log_timeline", ["field_status"])
+        module("module_detail_card", `${object}详情`, "detail_card", ["field_code", "field_customer", "field_name", "field_amount", "field_owner", "field_status", "field_description", "field_attachment", "field_risk"], domainFields),
+        module("module_timeline", "状态记录", "log_timeline", ["field_status"], domainFields)
       ];
   const detailActionIds = domainDetailPattern ? domainDetailPattern.actionIds : (context.hasApproval ? ["action_withdraw"] : ["action_complete", "action_return"]);
 
   const createModules = domainCreatePattern
-    ? domainCreatePattern.modules.map((m) => module(m.id, m.name, m.type as "filter" | "table" | "form" | "detail_card" | "approval_panel" | "log_timeline", m.fieldIds))
-    : [module("module_form", `${object}表单`, "form", ["field_customer", "field_name", "field_amount", "field_description", "field_attachment"])];
+    ? domainCreatePattern.modules.map((m) => module(m.id, m.name, m.type as "filter" | "table" | "form" | "detail_card" | "approval_panel" | "log_timeline", m.fieldIds, domainFields))
+    : [module("module_form", `${object}表单`, "form", ["field_customer", "field_name", "field_amount", "field_description", "field_attachment"], domainFields)];
   const createActionIds = domainCreatePattern ? domainCreatePattern.actionIds : ["action_submit"];
 
   return {
@@ -328,7 +335,7 @@ function createPrototypeSpec(context: GenericContext) {
       ]),
       ...(processPage ? [processPage] : []),
       page("page_log", `${object}操作记录页`, "log", "/items/:id/logs", `查看完整状态和操作记录`, [
-        module("module_log", "操作记录", "log_timeline", ["field_status"])
+        module("module_log", "操作记录", "log_timeline", ["field_status"], domainFields)
       ], [], [], ["feature_process"], [
         { roleId: operatorRoleId(context), visible: true },
         { roleId: managerRoleId(context), visible: true },
@@ -486,7 +493,7 @@ function createHtmlPrototype(context: GenericContext, now: string) {
   };
 }
 
-function createPrototypeMeta(context: GenericContext) {
+function createPrototypeMeta(context: GenericContext, domainFields?: DomainFieldMap) {
   const domain = context.domainMatch?.domain;
   const pages = context.hasApproval ? ["page_list", "page_detail", "page_create", "page_approval", "page_log"] : ["page_list", "page_detail", "page_create", "page_log"];
   const modules = context.hasApproval
@@ -503,13 +510,13 @@ function createPrototypeMeta(context: GenericContext) {
     sourcePrototypeSpecId: "prototype_generic_b2b",
     pageMappings: pages.map((id) => mapping(`mapping_${id}`, id, "page", "data-page-id", `[data-page-id="${id}"]`, pageName(id, context))),
     moduleMappings: modules.map((id) => mapping(`mapping_${id}`, id, "module", "data-module-id", `[data-module-id="${id}"]`, moduleName(id, context))),
-    fieldMappings: fieldIds.map((id) => mapping(`mapping_${id}`, id, "field", "data-field-id", fieldSelector(id), fieldName(id, context))),
+    fieldMappings: fieldIds.map((id) => mapping(`mapping_${id}`, id, "field", "data-field-id", fieldSelector(id), fieldName(id, context, domainFields))),
     actionMappings: actions.map((id) => mapping(`mapping_${id}`, id, "action", "data-action-id", `[data-action-id="${id}"]`, actionName(id, context))),
     uiStateMappings: ["ui_state_empty", "ui_state_error", "ui_state_no_permission"].map((id) => mapping(`mapping_${id}`, id, "ui_state", "data-ui-state-id", `[data-ui-state-id="${id}"]`, uiStateName(id)))
   };
 }
 
-function createPrdSpec(context: GenericContext) {
+function createPrdSpec(context: GenericContext, _domainFields?: DomainFieldMap) {
   const processSection = context.hasApproval
     ? prd("prd_section_action_approve", "审批通过", "state_transition", "state_transition", approvalTransitionTargetId(context), `审批人点击通过后，${context.businessObject}按审批路径流转；全部必经节点通过后进入${completedStateName(context)}状态，并写入操作记录。${context.approvalRouteText}`)
     : prd("prd_section_action_complete", "处理完成", "state_transition", "state_transition", "transition_complete", `业务负责人点击完成后，${context.businessObject}进入已完成状态，并写入操作记录。`);
@@ -700,22 +707,12 @@ function page(id: string, name: string, type: "list" | "detail" | "create" | "ap
   };
 }
 
-function module(id: string, name: string, type: "filter" | "table" | "form" | "detail_card" | "approval_panel" | "log_timeline", fieldIds: string[]) {
-  return { id, name, type, fields: collection(fieldIds.map(field)), sourceRefs: [{ entityType: "feature" as const, entityId: type === "filter" || type === "table" ? "feature_export" : "feature_create" }] };
+function module(id: string, name: string, type: "filter" | "table" | "form" | "detail_card" | "approval_panel" | "log_timeline", fieldIds: string[], domainFields?: DomainFieldMap) {
+  return { id, name, type, fields: collection(fieldIds.map((fid) => resolveField(fid, domainFields))), sourceRefs: [{ entityType: "feature" as const, entityId: type === "filter" || type === "table" ? "feature_export" : "feature_create" }] };
 }
 
-let currentDomainFields: Map<string, { name: string; fieldKey: string; type: string; required: boolean }> | undefined;
-
-export function setDomainFieldMap(domain: DomainTemplate | undefined) {
-  if (domain) {
-    currentDomainFields = new Map(domain.defaultFields.map((f) => [f.id, { name: f.name, fieldKey: f.fieldKey, type: f.type, required: f.required }]));
-  } else {
-    currentDomainFields = undefined;
-  }
-}
-
-function field(id: string) {
-  const domainField = currentDomainFields?.get(id);
+function resolveField(id: string, domainFields?: DomainFieldMap) {
+  const domainField = domainFields?.get(id);
   if (domainField) {
     return { id, name: domainField.name, fieldKey: domainField.fieldKey, type: domainField.type as "text" | "number" | "money" | "date" | "datetime" | "select" | "multi_select" | "textarea" | "file" | "user" | "department" | "status", required: domainField.required };
   }
@@ -836,8 +833,8 @@ function moduleName(id: string, context: GenericContext): string {
   }[id] || id;
 }
 
-function fieldName(id: string, context: GenericContext): string {
-  const domainField = currentDomainFields?.get(id);
+function fieldName(id: string, context: GenericContext, domainFields?: DomainFieldMap): string {
+  const domainField = domainFields?.get(id);
   if (domainField) return domainField.name;
   return {
     field_code: `${context.businessObject}编号`,

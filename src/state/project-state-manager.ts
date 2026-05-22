@@ -72,9 +72,33 @@ export function createEmptyProjectState(name = "expense-approval", now = new Dat
   };
 }
 
+/**
+ * Load and parse a project state file.
+ * @throws {Error} if file not found or JSON/Zod validation fails.
+ */
 export async function loadProjectState(filePath: string): Promise<ProjectState> {
   const content = await readFile(filePath, "utf8");
   return projectStateSchema.parse(JSON.parse(content));
+}
+
+/** Safe variant that returns a Result instead of throwing. */
+export async function loadProjectStateSafe(
+  filePath: string
+): Promise<{ ok: true; state: ProjectState } | { ok: false; issues: Array<{ id: string; severity: "error" | "warning"; code: string; message: string }> }> {
+  try {
+    const state = await loadProjectState(filePath);
+    return { ok: true, state };
+  } catch (error) {
+    return {
+      ok: false,
+      issues: [{
+        id: "state_load_error",
+        severity: "error",
+        code: "STATE_LOAD_FAILED",
+        message: error instanceof Error ? error.message : String(error)
+      }]
+    };
+  }
 }
 
 export async function saveProjectState(filePath: string, state: ProjectState): Promise<void> {

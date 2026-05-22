@@ -63,9 +63,35 @@ export function renderPrototypeReviewHtml(state: ProjectState): RenderOutcome {
     $("body").append(tooltip);
   }
 
+  // Build sidebar items from annotations
+  const sidebarItems = annotations
+    .map((a) => {
+      const levelClass = a.annotationLevel ? ` level-${a.annotationLevel}` : " level-module";
+      const activatePathAttr = a.activatePath
+        ? ` data-activate-path='${htmlEscape(JSON.stringify(a.activatePath))}'`
+        : "";
+      return `<div class="prd-sidebar-item" data-annotation-id="${htmlEscape(a.id)}" data-badge-id="${htmlEscape(a.id)}"${activatePathAttr}>
+    <span class="prd-sidebar-number${levelClass}">${a.annotationNumber}</span>
+    <div>
+      <div class="prd-sidebar-title">${htmlEscape(a.title)}</div>
+      <div class="prd-sidebar-desc">${htmlEscape(a.targetDescription)}</div>
+    </div>
+  </div>`;
+    })
+    .join("\n");
+
+  const sidebar = `<aside class="prd-sidebar" id="prd-sidebar">
+  <div class="prd-sidebar-header">
+    <span class="prd-sidebar-header-title">需求列表</span>
+  </div>
+  <div class="prd-sidebar-list">${sidebarItems}</div>
+</aside>
+<button class="prd-sidebar-toggle-btn" id="prd-sidebar-toggle" title="收起/展开需求列表">◀</button>`;
+
   const style = buildStyles();
-  const script = buildScript();
+  const script = buildScript(annotations);
   $("head").append(style);
+  $("body").append(sidebar);
   $("body").append(script);
   const content = $.html();
 
@@ -237,12 +263,218 @@ function buildStyles(): string {
 .prd-annotations-hidden .prd-annotation-badge {
   display: none !important;
 }
+
+/* === Badge active highlight === */
+.prd-badge-active {
+  background: #ef4444 !important;
+  transform: scale(1.3);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+  transition: all 0.3s ease;
+}
+
+/* === Sidebar === */
+.prd-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 340px;
+  background: #fff;
+  border-left: 1px solid #e5e7eb;
+  box-shadow: -2px 0 8px rgba(0,0,0,0.08);
+  z-index: 9998;
+  display: flex;
+  flex-direction: column;
+  font-family: Arial, "Microsoft YaHei", sans-serif;
+  font-size: 13px;
+  transition: transform 0.3s ease;
+}
+.prd-sidebar.collapsed {
+  transform: translateX(100%);
+}
+.prd-sidebar.collapsed + .prd-sidebar-toggle-btn {
+  right: 0;
+}
+.prd-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+  flex-shrink: 0;
+}
+.prd-sidebar-header-title {
+  font-weight: bold;
+  font-size: 14px;
+  color: #1f2937;
+}
+.prd-sidebar-toggle-btn {
+  position: fixed;
+  top: 12px;
+  right: 340px;
+  width: 28px;
+  height: 28px;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px 0 0 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #6b7280;
+  z-index: 9999;
+  transition: right 0.3s ease;
+}
+.prd-sidebar.collapsed ~ .prd-sidebar-toggle-btn {
+  right: 0;
+}
+.prd-sidebar-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+.prd-sidebar-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+  border-left: 3px solid transparent;
+}
+.prd-sidebar-item:hover {
+  background: #f3f4f6;
+}
+.prd-sidebar-item.active {
+  background: #eff6ff;
+  border-left-color: #3b82f6;
+}
+.prd-sidebar-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 20px;
+  padding: 0 4px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: bold;
+  color: #fff;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.prd-sidebar-number.level-page { background: rgb(250, 173, 20); }
+.prd-sidebar-number.level-module { background: #3b82f6; }
+.prd-sidebar-number.level-component { background: #22c55e; }
+.prd-sidebar-number.level-action { background: #6b7280; }
+.prd-sidebar-title {
+  flex: 1;
+  line-height: 1.4;
+  color: #374151;
+}
+.prd-sidebar-desc {
+  font-size: 11px;
+  color: #9ca3af;
+  margin-top: 2px;
+}
+
+/* === Markdown table in tooltip === */
+.prd-tooltip-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin: 8px 0;
+}
+.prd-tooltip-table th {
+  background: #f5f5f5;
+  padding: 6px 8px;
+  text-align: left;
+  border: 1px solid #e0e0e0;
+  font-weight: 600;
+}
+.prd-tooltip-table td {
+  padding: 6px 8px;
+  border: 1px solid #e0e0e0;
+}
 </style>`;
 }
 
-function buildScript(): string {
+function buildScript(annotations: Array<{ id: string; activatePath?: Array<{ action: string; selector: string; description?: string }> }>): string {
+  const annotationData = JSON.stringify(
+    annotations.map((a) => ({ id: a.id, activatePath: a.activatePath || null }))
+  );
   return `<script>
 (function() {
+  var annotationData = ${annotationData};
+
+  // --- Sidebar toggle ---
+  var sidebar = document.getElementById('prd-sidebar');
+  var toggleBtn = document.getElementById('prd-sidebar-toggle');
+  if (toggleBtn && sidebar) {
+    toggleBtn.addEventListener('click', function() {
+      sidebar.classList.toggle('collapsed');
+      toggleBtn.textContent = sidebar.classList.contains('collapsed') ? '▶' : '◀';
+      toggleBtn.style.right = sidebar.classList.contains('collapsed') ? '0' : '340px';
+    });
+  }
+
+  // --- executeActivatePath ---
+  function executeActivatePath(steps, callback) {
+    var i = 0;
+    function nextStep() {
+      if (i >= steps.length) { if (callback) callback(); return; }
+      var step = steps[i++];
+      var el = document.querySelector(step.selector);
+      if (!el) { nextStep(); return; }
+      if (step.action === 'click' || step.action === 'tab_switch') {
+        el.click();
+        setTimeout(nextStep, 300);
+      } else if (step.action === 'scroll') {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(nextStep, 300);
+      } else {
+        setTimeout(nextStep, 300);
+      }
+    }
+    nextStep();
+  }
+
+  // --- Sidebar item click → navigate to badge ---
+  document.querySelectorAll('.prd-sidebar-item').forEach(function(item) {
+    item.addEventListener('click', function() {
+      var annotationId = item.getAttribute('data-annotation-id');
+      // Deactivate previous
+      document.querySelectorAll('.prd-sidebar-item.active').forEach(function(el) { el.classList.remove('active'); });
+      item.classList.add('active');
+
+      // Find annotation data for activatePath
+      var aData = annotationData.find(function(d) { return d.id === annotationId; });
+
+      function navigateToBadge() {
+        var badge = document.querySelector('[data-annotation-badge="' + annotationId + '"]');
+        if (!badge) return;
+        badge.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Highlight badge
+        badge.classList.add('prd-badge-active');
+        setTimeout(function() { badge.classList.remove('prd-badge-active'); }, 3000);
+        // Show tooltip
+        var tooltip = document.querySelector('[data-tooltip-for="' + annotationId + '"]');
+        if (tooltip) {
+          tooltip.style.display = 'block';
+          positionTooltip(tooltip, badge);
+        }
+      }
+
+      if (aData && aData.activatePath && aData.activatePath.length > 0) {
+        executeActivatePath(aData.activatePath, navigateToBadge);
+      } else {
+        navigateToBadge();
+      }
+    });
+  });
+
   // --- Hover to show tooltip ---
   document.querySelectorAll('[data-annotation-badge]').forEach(function(badge) {
     var annotationId = badge.getAttribute('data-annotation-badge');
@@ -324,13 +556,16 @@ function buildScript(): string {
     var left = badgeRect.left - tooltipWidth - gap;
     var top = badgeRect.bottom + gap;
 
+    // Account for sidebar width (340px) when positioning
+    var sidebarWidth = sidebar && !sidebar.classList.contains('collapsed') ? 348 : 0;
+
     // If too far left, show right of badge
     if (left < 8) {
       left = badgeRect.right + gap;
     }
-    // If still too far right (tooltip goes off right edge)
-    if (left + tooltipWidth > window.innerWidth - 8) {
-      left = window.innerWidth - tooltipWidth - 8;
+    // If too far right (tooltip goes off right edge, accounting for sidebar)
+    if (left + tooltipWidth > window.innerWidth - sidebarWidth - 8) {
+      left = window.innerWidth - sidebarWidth - tooltipWidth - 8;
     }
     // If too far down, show above badge
     if (top + tooltipHeight > window.innerHeight - 8) {
@@ -356,6 +591,9 @@ function markdownToHtml(md: string): string {
   let inList = false;
   let listItems: string[] = [];
   let listType: "ul" | "ol" = "ul";
+  let tableRows: string[] = [];
+  let inTable = false;
+  let tableHasHeader = false;
 
   function closeList() {
     if (inList && listItems.length > 0) {
@@ -365,8 +603,49 @@ function markdownToHtml(md: string): string {
     }
   }
 
+  function closeTable() {
+    if (inTable && tableRows.length > 0) {
+      const headerRow = tableHasHeader ? tableRows[0] : "";
+      const bodyRows = tableHasHeader ? tableRows.slice(1) : tableRows;
+      const thead = tableHasHeader ? `<thead>${headerRow}</thead>` : "";
+      parts.push(`<table class="prd-tooltip-table">${thead}<tbody>${bodyRows.join("")}</tbody></table>`);
+      tableRows = [];
+      inTable = false;
+      tableHasHeader = false;
+    }
+  }
+
+  function parseTableRow(line: string, isHeader: boolean): string {
+    const cells = line.split("|").slice(1, -1);
+    const tag = isHeader ? "th" : "td";
+    return "<tr>" + cells.map((c) => `<${tag}>${inlineFormat(c.trim())}</${tag}>`).join("") + "</tr>";
+  }
+
+  function isSeparator(line: string): boolean {
+    return /^\|[\s:]*-+[\s:]*(\|[\s:]*-+[\s:]*)*\|$/.test(line);
+  }
+
   for (const line of lines) {
     const trimmed = line.trim();
+
+    // Table detection
+    if (trimmed.startsWith("|") && trimmed.endsWith("|")) {
+      if (!inTable) {
+        closeList();
+        inTable = true;
+        tableHasHeader = false;
+      }
+      if (isSeparator(trimmed)) {
+        tableHasHeader = tableRows.length > 0;
+        continue;
+      }
+      const isHeader = !tableHasHeader && tableRows.length === 0;
+      tableRows.push(parseTableRow(trimmed, isHeader));
+      continue;
+    } else if (inTable) {
+      closeTable();
+    }
+
     if (!trimmed) {
       closeList();
       continue;
@@ -410,6 +689,7 @@ function markdownToHtml(md: string): string {
   }
 
   closeList();
+  closeTable();
   return parts.join("\n");
 }
 

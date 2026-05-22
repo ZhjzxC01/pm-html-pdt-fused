@@ -4,58 +4,41 @@
 
 ## 设计体系
 
-HTML 原型严格遵循 [DESIGN.md](../references/DESIGN.md) 定义的 **Meridian** 设计体系，基于 Google 官方 [DESIGN.md 格式规范](https://github.com/google-labs-code/design.md)。
+HTML 原型遵循项目动态生成的设计体系，通过 `scripts/design-search/search.py --design-system` 基于产品类型和行业自动推荐。
 
 ### 设计 Token
 
-所有视觉属性通过 CSS 变量统一管理，Token 定义在 `references/DESIGN.md` 的 YAML front matter 中：
+所有视觉属性通过 CSS 变量统一管理，Token 来源于项目 `<project>/design-system/MASTER.md`（由 search.py 生成并持久化）。Token 架构参考 `references/design-intelligence/token-architecture.md`（三层结构：Primitive → Semantic → Component）。
 
 | 类别 | Token 前缀 | 示例 | 用途 |
 |------|-----------|------|------|
-| Colors | `--color-` | `--color-primary: #2563EB` | 色彩角色（26+ 角色） |
-| Typography | `--typescale-` | `--typescale-body-md` | 排版比例尺（12 级） |
-| Shape | `--shape-` | `--shape-lg: 12px` | 形状尺度（7 级） |
-| Elevation | `--elevation-` | `--elevation-1` | 阴影层级（5 级） |
-| Spacing | `--spacing-` | `--spacing-base: 16px` | 间距尺度（9 级） |
+| Colors | `--color-` | `--color-primary: #0F172A` | 色彩角色 |
+| Font | `--font-` | `--font-heading` | 字体族 |
+| Spacing | `--spacing-` | `--spacing-base: 16px` | 间距尺度 |
+| Radius | `--radius-` | `--radius-lg: 12px` | 圆角尺度 |
+| Shadow | `--shadow-` | `--shadow-md` | 阴影层级 |
 
 ### 注入机制
 
 设计体系通过两层注入生效：
 
-1. **Prompt 层**：`prompts/html-prototype-generator.md` 包含完整的 CSS 变量声明和组件规范，指导 LLM 生成符合 Meridian 的 HTML。
-2. **渲染层**：`src/generators/html-prototype-generator.ts` 中的 `buildDesignSystemCSS()` 函数在 HTML 注入交互引擎时，同步注入完整的 CSS 设计系统，覆盖 LLM 输出的基础样式。
+1. **Prompt 层**：`prompts/html-prototype-generator.md` 包含 CSS 变量声明规范，指导 LLM 生成符合项目设计体系的 HTML。
+2. **渲染层**：`src/generators/html-prototype-generator.ts` 中的 `buildDesignSystemCSS()` 函数在 HTML 注入交互引擎时，同步注入 CSS 设计系统。
 
-### 色彩角色
+### 设计体系生成
 
-| 角色 | 值 | 用途 |
-|------|-----|------|
-| Primary | `#2563EB` | 按钮、链接、选中态 |
-| On Primary | `#FFFFFF` | 主色表面上的文字 |
-| Primary Container | `#DBEAFE` | 低强调主色区域 |
-| Secondary | `#0F172A` | 侧边栏、结构性元素 |
-| Tertiary | `#0D9488` | 成功状态、辅助强调 |
-| Error | `#DC2626` | 错误状态、危险操作 |
-| Surface | `#FFFFFF` | 卡片、对话框背景 |
-| On Surface | `#0F172A` | 主要文字 |
-| On Surface Variant | `#64748B` | 次要文字 |
-| Outline | `#94A3B8` | 边框 |
-| Outline Variant | `#E2E8F0` | 分割线 |
+```bash
+python3 scripts/design-search/search.py "<产品类型> <行业> <关键词>" --design-system -f markdown [-p "Project Name"] --persist
+```
+
+生成的设计体系包含：风格推荐、配色方案（语义化色彩角色）、字体方案、间距/圆角/阴影 Token、组件规范、反模式警告和 Pre-Delivery Checklist。
 
 ### 组件规范
 
-| 组件 | 类型 | 规范 |
-|------|------|------|
-| 按钮 | Primary / Secondary / Ghost / Danger | 圆角 8px，高度 38px，内边距 9px 20px |
-| 卡片 | Card / Card Elevated | 圆角 12px，内边距 24px，Level 1 阴影 |
-| 输入框 | Input Field | 高度 38px，圆角 8px，边框 #E2E8F0 |
-| 表格 | Data Table | 表头 Label Medium，表体 Body Medium，行高 44px |
-| 徽章 | Badge | 全圆角胶囊形 |
-| 侧边栏 | Sidebar | 深海军蓝背景，宽度 240px |
-| 顶部栏 | Topbar | 白色背景，高度 56px |
+组件规格参考 `references/design-intelligence/component-specs.md`，包含 Button、Input、Card、Badge、Alert、Dialog、Table 的详细规格（变体、尺寸、状态、解剖图）。
 
 ### 布局
 
 - 经典 B 端三栏布局：侧边栏 (240px) + 顶栏 (56px) + 内容区
 - 4px 基础间距网格
 - 内容区最大宽度 1280px
-- 页面背景 #F8FAFC，卡片背景 #FFFFFF

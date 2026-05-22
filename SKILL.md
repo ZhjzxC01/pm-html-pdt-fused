@@ -1,14 +1,14 @@
 ---
 name: pm-html-pdt-fused
-version: 1.1.0
-description: 用户要求写 PRD、产品需求、功能清单、B 端原型、高保真 HTML 原型、页面标注、PRD 标注原型、根据原型生成 PRD、根据需求生成原型、检查 PRD 与原型一致性时使用。
+version: 2.0.0
+description: 用户要求写 PRD、产品需求、功能清单、B 端原型、高保真 HTML 原型、页面标注、PRD 标注原型、根据原型生成 PRD、根据需求生成原型、检查 PRD 与原型一致性、设计体系生成、品牌设计、Logo/Icon、演示文稿、Banner 设计时使用。
 metadata:
-  short-description: B 端 PRD / 原型 / 标注闭环
+  short-description: B 端 PRD / 原型 / 标注 / 设计智能闭环
 ---
 
-# 融合版 B 端产品经理闭环技能
+# 融合版 B 端产品经理闭环技能（含设计智能）
 
-这是一个融合版产品经理闭环技能：保留当前 TypeScript 工程的 `ProjectState`、校验器、渲染器和测试体系，同时吸收旧版 PDT 技能的对话式推进、三类主交付物和 B 端业务原型规则。
+这是一个融合版产品经理闭环技能：保留 TypeScript 工程的 `ProjectState`、校验器、渲染器和测试体系，同时吸收 UI/UX Pro Max 的设计智能引擎（BM25 搜索、161 色板、57 字体、67 风格、99 UX 规则、设计体系生成器）和全套设计资产能力（品牌、Logo、Icon、演示文稿、Banner）。
 
 ## 默认行为
 
@@ -60,12 +60,18 @@ metadata:
 2. 原始资料处理（如有）：读取 `raw-materials/` 中的文件，提取关键信息，整理摘要并确认
 3. 对话澄清（如有）：基于原始资料和需求文本，补问缺失的关键信息
 4. 需求整理与功能清单
-5. 生成业务原型
-6. 复杂度评估：自动评估需求级别（S/M/L），向用户展示评估结果并等待确认
-7. 根据确认的级别和原型生成 `PRD`（S 级 8 章节 / M 级 17 章节 / L 级 21 章节）
-8. 根据 `PRD` 反向标注原型
-9. 执行一致性检查；必要时补充测试用例和流程图
-10. 生成业务确认单（面向业务方，非技术语言）和上线交付包（权限配置清单、字典配置清单、上线 Checklist、培训大纲）
+5. 复杂度评估：自动评估需求级别（S/M/L），向用户展示评估结果并等待确认
+6. 设计体系确认 + 生成业务原型
+   - 6a. 基于产品类型和行业，调用 `python3 scripts/design-search/search.py "<产品类型> <行业> <关键词>" --design-system -f markdown` 自动生成设计体系（风格、配色、字体、组件规范）
+   - 6b. 向用户展示 2-3 个风格方案对比（每个方案含：风格名、配色方向、适用场景、参考产品），标注推荐方案及推荐理由，等待用户选择
+   - 6c. 确认后将设计体系写入 `<project>/design-system/MASTER.md`
+   - 6d. 基于确认的设计体系生成 HTML 原型（S 级只生成核心页面原型，M 级生成完整模块原型，L 级生成全量页面原型）
+7. 设计资产扩展（可选）：如果用户需要品牌设计、Logo、Icon、演示文稿、Banner 等，在此步骤按需调用对应脚本生成
+8. 根据确认的级别和原型生成 `PRD`（S 级 9 章节 / M 级 17 章节 / L 级 21 章节）
+9. 根据 `PRD` 反向标注原型
+10. 执行一致性检查 + UX 质量审查（参考 `references/ux-quality-rules.md`）；必要时补充测试用例和流程图
+11. 业务确认单（可选）：面向业务方，非技术语言
+12. 上线交付包（可选）：权限配置清单、字典配置清单、上线 Checklist、培训大纲
 
 默认使用 LLM 大模型模式生成原型和 PRD。`rule` 模式仅用于内部测试、CI/CD 打通等必要场景，不建议用于正式产品交付。
 
@@ -78,7 +84,7 @@ metadata:
 - **Gate 1 原始输入审查**：业务分析师 + UX 设计师，审查用户原始需求
 - **Gate 2 需求结构审查**：业务分析师 + 技术架构师 + QA 工程师，审查结构化需求、状态机和复杂度评估
 - **Gate 3 原型结构审查**：业务分析师 + UX 设计师 + UI 设计师 + 技术架构师，审查需求覆盖、原型规格和流程规格
-- **Gate 4 HTML 和测试用例审查**：UI 设计师 + 前端开发 + QA 工程师，审查 HTML 原型和测试用例
+- **Gate 4 HTML 和测试用例审查**：UI 设计师 + 前端开发 + QA 工程师，审查 HTML 原型和测试用例（UI 设计师审查时参考 `references/ux-quality-rules.md` 中的 UX 质量标准和项目设计体系）
 - **Gate 5 PRD 审查**：业务分析师 + 技术架构师 + QA 工程师，审查 PRD 追溯完整性、技术约束和验收标准可测试性
 
 审查发现分三级：`critical`（必须修复）、`warning`（建议修复）、`suggestion`（优化建议）。`--strict` 模式下 `critical` 发现阻断生成。
@@ -94,6 +100,14 @@ metadata:
 | 对话与模式 | `references/conversation-core.md` | 需要理解对话推进规则、自动初始化、澄清规则、增量修改时 |
 | 入口模式 | `references/conversation-modes.md` | 需要变更模式、配置变更、Bug修复、数据迁移、系统对接、跳步、恢复等非默认流程时 |
 | 交付闭环 | `references/delivery-loop.md` | 需要确认主交付物、支撑产物边界、业务确认单或上线交付包时 |
+| 设计体系生成 | `scripts/design-search/search.py` | 步骤 5a 自动生成设计体系时 |
+| Token 架构 | `references/design-intelligence/token-architecture.md` | 需要理解三层 Token 架构（Primitive→Semantic→Component）时 |
+| 组件规格 | `references/design-intelligence/component-specs.md` | 生成原型的组件样式时 |
+| UX 质量规则 | `references/ux-quality-rules.md` | Gate 4 审查或原型自查时 |
+| 品牌设计 | `references/design-intelligence/brand/` | 用户需要品牌相关设计（品牌指南、语音、视觉身份）时 |
+| 演示文稿 | `references/design-intelligence/design/slides-*.md` | 用户需要生成 HTML 演示文稿时 |
+| Banner 设计 | `references/design-intelligence/banner/` | 用户需要 Banner 创意设计时 |
+| Logo/Icon 设计 | `references/design-intelligence/design/` | 用户需要 Logo 或 Icon 设计时 |
 | B 端业务规则 | `references/b2b-product-rules.md` | 需要主数据管理、数据权限、批量操作、操作日志、编码规则、报表、导入导出等 B 端通用规则时 |
 | B 端页面模式 | `references/b2b-page-patterns.md` | 生成原型时需要选择页面模式（列表/看板/树形/多Tab/步骤表单等）时 |
 | B 端异常场景 | `references/b2b-exception-scenarios.md` | 生成 PRD 或原型时需要覆盖异常场景时 |
@@ -155,6 +169,8 @@ pnpm dev -- serve --project <项目目录>
 - [ ] **禁止笼统描述**：是否有"添加适当的校验""处理边界情况"等无法执行的描述？
 - [ ] **禁止互相替代**：PRD 中是否用"参见原型"代替了具体规则？原型中是否用"参见 PRD"代替了具体交互？
 - [ ] **禁止过度假设**：是否在需求未提及的地方编造了业务规则而不是列入 pendingQuestions？
+- [ ] **禁止过度设计（YAGNI）**：是否为假设的未来需求预留了接口、字段、扩展点？每个字段和功能必须有当前需求支撑，不能因为"将来可能需要"而添加。
+- [ ] **禁止歧义遗漏**：是否有规则可被两种方式理解但未标记为 pendingQuestion？（参考 self-review.md 歧义扫描）
 - [ ] **确认检查**：至少检查了核心业务对象、状态机终态、审批流开关、角色范围？
 
 ## 增量修改与回退机制
@@ -164,7 +180,7 @@ pnpm dev -- serve --project <项目目录>
 ### 依赖关系图
 
 ```
-功能清单 → 原型 → 复杂度评估 → PRD → 标注 → 一致性检查
+功能清单 → 复杂度评估 → 原型 → PRD → 标注 → 一致性检查 → 业务确认单（可选） → 上线交付包（可选）
 ```
 
 上游产物修改时，下游产物自动标记为 **dirty**（需重新生成）。
@@ -202,8 +218,8 @@ pnpm dev -- serve --project <项目目录>
 |----|------|
 | `draft` | 刚初始化，尚未开始 |
 | `feature_list_done` | 功能清单已确认 |
-| `prototype_done` | 原型已确认 |
 | `complexity_assessed` | 复杂度评估已确认 |
+| `prototype_done` | 原型已确认 |
 | `prd_done` | PRD 已确认 |
 | `annotation_done` | 标注已确认 |
 | `consistency_checked` | 一致性检查已完成 |

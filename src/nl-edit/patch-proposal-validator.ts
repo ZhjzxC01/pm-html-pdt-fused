@@ -68,9 +68,33 @@ export function validatePatchProposal(state: ProjectState, proposal: PatchPropos
 }
 
 export function parsePatchProposal(value: unknown): PatchProposal {
-  const proposal = value as PatchProposal;
-  if (!proposal || typeof proposal !== "object" || !Array.isArray(proposal.patches)) {
-    throw new Error("patch-proposal.json 结构不合法。");
+  if (!value || typeof value !== "object") {
+    throw new Error("patch-proposal.json 结构不合法：不是对象。");
   }
-  return proposal;
+  const obj = value as Record<string, unknown>;
+  if (!Array.isArray(obj.patches)) {
+    throw new Error("patch-proposal.json 结构不合法：缺少 patches 数组。");
+  }
+  if (typeof obj.baseVersion !== "number") {
+    throw new Error("patch-proposal.json 结构不合法：baseVersion 必须是数字。");
+  }
+  if (typeof obj.projectId !== "string") {
+    throw new Error("patch-proposal.json 结构不合法：projectId 必须是字符串。");
+  }
+  if (typeof obj.explanation !== "string") {
+    throw new Error("patch-proposal.json 结构不合法：explanation 必须是字符串。");
+  }
+  if (!obj.semanticAction || typeof obj.semanticAction !== "object") {
+    throw new Error("patch-proposal.json 结构不合法：缺少 semanticAction。");
+  }
+  if (!Array.isArray(obj.queries)) {
+    throw new Error("patch-proposal.json 结构不合法：缺少 queries 数组。");
+  }
+  if (obj.riskLevel !== "low" && obj.riskLevel !== "medium" && obj.riskLevel !== "high") {
+    throw new Error("patch-proposal.json 结构不合法：riskLevel 必须是 low/medium/high。");
+  }
+  if (!obj.targetScope || typeof obj.targetScope !== "object") {
+    throw new Error("patch-proposal.json 结构不合法：缺少 targetScope。");
+  }
+  return value as PatchProposal;
 }

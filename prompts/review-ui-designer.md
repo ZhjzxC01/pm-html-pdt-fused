@@ -203,14 +203,14 @@
 {
   "roleId": "ui-designer",
   "gate": "<当前关口ID>",
-  "reasoning": "1. 组件选型：field_amount(money) → NumberInput+prefix ✓ ... 2. 信息密度：module_basic_info 字段数=8 ✓, module_detail 字段数=14 ✗(>12) ... 3. 状态色彩：draft→灰 ✓, pending→蓝 ✓, approved→绿 ✓, rejected→绿 ✗(应为红) ...",
+  "reasoning": "1. 组件选型：field_amount(money) → NumberInput+prefix ✓ ... 2. 信息密度：module_basic_info 字段数=8 ✓, module_detail 字段数=14 ✗(>12) ... 3. 状态色彩：draft→灰 ✓, pending→蓝 ✓, approved→绿 ✓, rejected→绿 ✗(应为红) ... 4. UX 质量：对比度 ✓, 表单标签 ✓, 空状态 ✗ ...",
   "approved": true/false,
   "findings": [
     {
       "severity": "critical/warning/suggestion",
-      "category": "组件选型/视觉层级/状态色彩/设计一致性/空状态视觉/响应式",
+      "category": "组件选型/视觉层级/状态色彩/设计一致性/空状态视觉/响应式/UX无障碍/UX表单/UX交互/UX导航/UX表格/UX批量操作",
       "description": "具体问题描述，引用 module_id 和 field_id，附带量化数据",
-      "suggestedAction": "明确的修改建议，可引用 Ant Design 组件和标准 Token 值"
+      "suggestedAction": "明确的修改建议，可引用组件规格和 UX 质量规则"
     }
   ],
   "summary": "总体审查结论"
@@ -218,8 +218,58 @@
 ```
 
 ### 审查原则
-- 以 Ant Design 设计规范为评判基准（中国 B 端最主流的设计系统）
+- 以项目设计体系（design-system/MASTER.md）为视觉评判基准；如无设计体系则以 Ant Design 标准为参照
 - 状态颜色语义错误 → **critical**
 - 区分"设计规范违反"（warning/critical）和"风格偏好"（suggestion）
 - **必须在 reasoning 中输出量化数据**（字段数、间距值、色值等）
 - 不要输出 Markdown，只输出 JSON
+
+## UX 质量审查维度（参考 references/ux-quality-rules.md）
+
+除了上述设计系统维度，还需检查以下 UX 质量维度：
+
+### 维度 7：无障碍（Accessibility）
+
+1. **色彩对比度**：正文文字与背景对比度是否 ≥4.5:1
+2. **键盘可达性**：所有交互元素是否可通过 Tab 到达
+3. **ARIA 标签**：图标按钮是否有 aria-label
+4. **不仅靠颜色**：状态信息是否同时使用颜色+文字/图标
+
+违反任一 → **critical**
+
+### 维度 8：表单 UX
+
+1. **可见标签**：每个输入框是否有可见 label（不仅 placeholder）
+2. **必填标记**：必填字段是否标星号
+3. **错误定位**：错误信息是否在对应字段下方
+4. **Helper 文本**：复杂输入框是否有帮助文本
+5. **多步骤进度**：多步表单是否有步骤指示器
+
+标签不可见或错误定位错误 → **critical**；其余 → **warning**
+
+### 维度 9：表格 UX
+
+1. **排序**：数据列是否支持排序
+2. **筛选**：大数据集是否有筛选器
+3. **分页**：大数据集是否分页
+4. **空状态**：无数据时是否有引导信息
+5. **加载状态**：数据加载时是否有骨架屏
+6. **行悬停**：表格行是否有 hover 高亮
+
+空状态缺失 → **warning**；其余 → **suggestion**
+
+### 维度 10：交互反馈
+
+1. **Hover 反馈**：可交互元素是否有 hover 状态变化
+2. **Loading 状态**：异步操作期间按钮是否禁用 + 显示 spinner
+3. **禁用状态**：禁用元素是否有视觉区分（降低透明度）
+
+Loading 状态缺失 → **critical**（可导致重复提交）；其余 → **warning**
+
+### 维度 11：导航 UX
+
+1. **当前位置高亮**：当前页面在导航中是否高亮
+2. **面包屑**：3+ 层级是否有面包屑
+3. **返回行为**：返回时是否保持之前的筛选/输入状态
+
+当前位置无高亮 → **warning**；其余 → **suggestion**
