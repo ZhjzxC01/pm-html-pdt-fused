@@ -27,6 +27,8 @@ export function runConsistencyCheck(state: ProjectState): ConsistencyIssue[] {
   issues.push(...checkFlowActionRefs(state));
   issues.push(...checkPermissionCoverage(state));
   issues.push(...checkArtifactManifestStaleness(state));
+  issues.push(...checkPageNameConsistency(state));
+  issues.push(...checkInteractionCoverage(state));
 
   return issues;
 }
@@ -185,6 +187,64 @@ function checkArtifactManifestStaleness(state: ProjectState): ConsistencyIssue[]
         sourceArtifact: item.artifactType,
         fixSuggestion: "请运行 pm-html-skill render 重新渲染产物。"
       });
+    }
+  }
+
+  return issues;
+}
+
+function checkPageNameConsistency(state: ProjectState): ConsistencyIssue[] {
+  const issues: ConsistencyIssue[] = [];
+  if (!state.prototypeSpec || !state.htmlPrototype) return issues;
+
+  const htmlFiles = state.htmlPrototype.files.order
+    .map((id) => state.htmlPrototype!.files.byId[id]?.fileName ?? "")
+    .filter((f) => f.endsWith(".html"));
+
+  if (htmlFiles.length <= 1) return issues;
+
+  for (const pageId of state.prototypeSpec.pages.order) {
+    const normalizedId = pageId.replace(/^page_/, "").replace(/_/g, "").toLowerCase();
+    const hasMatch = htmlFiles.some((f) => {
+      const normalizedFile = f.replace(/\.(html?)$/, "").replace(/[\s_-]/g, "").toLowerCase();
+      return normalizedFile.includes(normalizedId) || normalizedId.includes(normalizedFile);
+    });
+    if (!hasMatch) {
+      const page = state.prototypeSpec.pages.byId[pageId];
+      issues.push({
+        id: `issue_page_name_no_file_${pageId}`,
+        severity: "warning",
+        code: "page_name_no_matching_file",
+        message: `页面 "${page.name}" (${pageId}) 没有匹配的 HTML 原型文件。`,
+        entityRef: { entityType: "page", entityId: pageId },
+        fixSuggestion: "确保原型 HTML 文件名与页面 ID 对应，或重新生成原型。"
+      });
+    }
+  }
+
+  return issues;
+}
+
+function checkInteractionCoverage(state: ProjectState): ConsistencyIssue[] {
+  const issues: ConsistencyIssue[] = [];
+  if (!state.prototypeSpec) return issues;
+
+  const interactionRequiredTypes = new Set(["filter", "table", "form", "tabs", "approval_panel"]);
+
+  for (const pageId of state.prototypeSpec.pages.order) {
+    const page = state.prototypeSpec.pages.byId[pageId];
+    for (const moduleId of page.modules.order) {
+      const module = page.modules.byId[moduleId];
+      if (interactionRequiredTypes.has(module.type) && (!module.interactions || module.interactions.length === 0)) {
+        issues.push({
+          id: `issue_module_no_interactions_${moduleId}`,
+          severity: "warning",
+          code: "module_missing_interactions",
+          message: `模块 "${module.name}" (${moduleId}, 类型: ${module.type}) 未声明交互模式。交互类模块必须在 interactions 字段中声明需要的交互模式。`,
+          entityRef: { entityType: "module", entityId: moduleId },
+          fixSuggestion: `请为 ${module.type} 类型模块添加 interactions 字段。参考 references/b2b-interaction-patterns.md 中的模式 ID。`
+        });
+      }
     }
   }
 

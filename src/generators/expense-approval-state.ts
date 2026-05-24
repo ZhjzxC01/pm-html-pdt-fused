@@ -364,11 +364,19 @@ function page(id: string, name: string, type: "list" | "detail" | "create" | "ap
 }
 
 function module(id: string, name: string, type: "filter" | "table" | "form" | "detail_card" | "approval_panel" | "log_timeline", fieldIds: string[]) {
+  const defaultInteractions: Record<string, string[]> = {
+    filter: ["advanced-filter", "search-debounce"],
+    table: ["hover-actions", "empty-state"],
+    form: ["conditional-display", "cross-field-validation"],
+    tabs: ["tab-memory"],
+    approval_panel: ["confirm-dialog", "toast-feedback"],
+  };
   return {
     id,
     name,
     type,
     fields: collection(fieldIds.map(field)),
+    interactions: defaultInteractions[type] ?? [],
     sourceRefs: [{ entityType: "feature" as const, entityId: type === "approval_panel" ? "feature_expense_approval" : "feature_expense_submit" }]
   };
 }

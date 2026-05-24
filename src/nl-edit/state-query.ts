@@ -63,7 +63,7 @@ export type SemanticAction =
       type: "add_module_to_page";
       pageNameOrId: string;
       moduleName: string;
-      moduleType: "filter" | "table" | "form" | "detail_card" | "approval_panel" | "log_timeline" | "chart" | "summary";
+      moduleType: "filter" | "table" | "form" | "detail_card" | "tabs" | "steps" | "approval_panel" | "log_timeline" | "empty_state" | "exception_state";
     }
   | {
       type: "add_filter_field";
@@ -91,7 +91,7 @@ export type SemanticAction =
   | {
       type: "add_ui_state";
       pageNameOrId: string;
-      stateType: "empty" | "error" | "loading" | "no_permission" | "success";
+      stateType: "normal" | "loading" | "empty" | "error" | "no_permission";
       stateName: string;
       description: string;
     }

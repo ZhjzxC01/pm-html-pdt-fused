@@ -223,6 +223,7 @@ type PageModuleSchemaShape = {
   fields: { byId: Record<string, z.infer<typeof fieldSpecSchema>>; order: string[] };
   tableColumns?: { byId: Record<string, z.infer<typeof tableColumnSpecSchema>>; order: string[] };
   childModules?: { byId: Record<string, PageModuleSchemaShape>; order: string[] };
+  interactions?: string[];
   sourceRefs: z.infer<typeof entityRefSchema>[];
 };
 
@@ -245,6 +246,7 @@ export const pageModuleSchema: z.ZodType<PageModuleSchemaShape> = z.lazy(() =>
     fields: entityCollectionSchema(fieldSpecSchema),
     tableColumns: entityCollectionSchema(tableColumnSpecSchema).optional(),
     childModules: entityCollectionSchema(pageModuleSchema).optional(),
+    interactions: z.array(z.string()).optional(),
     sourceRefs: z.array(entityRefSchema)
   })
 );
@@ -560,6 +562,12 @@ export const activatePathStepSchema = z.object({
   description: z.string().optional()
 });
 
+export const annotationChangeLogEntrySchema = z.object({
+  timestamp: z.string(),
+  changeType: z.enum(["created", "modified", "number_changed"]),
+  description: z.string()
+});
+
 export const prototypeAnnotationSchema = z.object({
   id: z.string().min(1),
   annotationNumber: z.number().int().min(1).max(999),
@@ -572,12 +580,15 @@ export const prototypeAnnotationSchema = z.object({
   position: annotationPositionSchema.optional(),
   severity: severitySchema,
   annotationLevel: z.enum(["page", "module", "component", "action"]).optional(),
-  activatePath: z.array(activatePathStepSchema).optional()
+  activatePath: z.array(activatePathStepSchema).optional(),
+  status: z.enum(["draft", "in_review", "approved"]).default("draft").optional(),
+  changeLog: z.array(annotationChangeLogEntrySchema).optional(),
+  relatedAnnotationIds: z.array(z.string()).optional()
 });
 
 export const prototypeAnnotationBrokenLinkSchema = z.object({
   id: z.string().min(1),
-  sourceType: z.enum(["prd_section", "acceptance_criterion", "test_case", "permission_rule", "state_transition"]),
+  sourceType: z.enum(["prd_section", "acceptance_criterion", "test_case", "permission_rule", "state_transition", "prd_section_uncovered"]),
   sourceId: z.string(),
   expectedTarget: entityRefSchema,
   reason: z.string(),
@@ -742,7 +753,7 @@ export const projectStateSchema = z.object({
   htmlPrototype: htmlPrototypeSchema.nullable(),
   prototypeMeta: prototypeMetaSchema.nullable(),
   flowSpec: flowSpecSchema.nullable(),
-  complexityAssessment: complexityAssessmentSchema.nullable().optional(),
+  complexityAssessment: complexityAssessmentSchema.nullable(),
   prdSpec: prdSpecSchema.nullable(),
   testCaseSpec: testCaseSpecSchema.nullable(),
   prototypeAnnotationSpec: prototypeAnnotationSpecSchema.nullable(),

@@ -17,7 +17,7 @@ FlowSpec 必须包含以下部分：
 每个业务对象的完整状态集合，至少包含：
 - **初始态**：如 `draft`（草稿）
 - **中间态**：如 `pending_approval`（待审批）、`processing`（处理中）
-- **终态**：至少 1 个正向终态（如 `completed`）和 1 个负向终态（如 `rejected`/`cancelled`）
+- **终态**：至少 1 个正向终态（如 `completed`）和 1 个负向终态（如 `rejected`/`cancelled`），状态 type 统一为 `terminal`
 
 ### 状态流转表
 
@@ -25,11 +25,11 @@ FlowSpec 必须包含以下部分：
 
 | 字段 | 说明 | 必须 |
 |------|------|------|
-| fromState | 当前状态 | 是 |
-| toState | 目标状态 | 是 |
-| trigger | 触发动作（如 submit、approve、reject） | 是 |
-| allowedRoles | 允许执行的角色列表 | 是 |
-| precondition | 前置条件（如"必填字段已填写"） | 否 |
+| fromStateId | 当前状态 ID | 是 |
+| toStateId | 目标状态 ID | 是 |
+| triggerActionId | 触发动作 ID（如 submit、approve、reject） | 是 |
+| allowedRoleIds | 允许执行的角色 ID 列表 | 是 |
+| guardCondition | 前置条件（如"必填字段已填写"） | 否 |
 
 ### 非法流转
 
@@ -48,17 +48,48 @@ FlowSpec 必须包含以下部分：
 
 ```json
 {
-  "states": [
-    { "id": "draft", "label": "草稿", "type": "initial" },
-    { "id": "pending_manager", "label": "待主管审批", "type": "intermediate" },
-    { "id": "approved", "label": "已通过", "type": "terminal_positive" },
-    { "id": "rejected", "label": "已驳回", "type": "terminal_negative" }
-  ],
-  "transitions": [
-    { "fromState": "draft", "toState": "pending_manager", "trigger": "submit", "allowedRoles": ["employee"], "precondition": "必填字段已填写" },
-    { "fromState": "pending_manager", "toState": "approved", "trigger": "approve", "allowedRoles": ["manager"] },
-    { "fromState": "pending_manager", "toState": "rejected", "trigger": "reject", "allowedRoles": ["manager"], "precondition": "必须填写驳回原因" }
-  ]
+  "id": "flow_expense_approval",
+  "flows": {
+    "byId": {
+      "flow_expense_approval": {
+        "id": "flow_expense_approval",
+        "name": "费用报销审批流",
+        "description": "费用报销从提交到审批完成的全流程",
+        "relatedPageIds": ["page_expense_list", "page_expense_detail"],
+        "relatedActionIds": ["action_submit", "action_approve", "action_reject"]
+      }
+    },
+    "order": ["flow_expense_approval"]
+  },
+  "stateMachines": {
+    "byId": {
+      "sm_expense": {
+        "id": "sm_expense",
+        "name": "报销单状态机",
+        "businessObjectId": "expense_report",
+        "states": {
+          "byId": {
+            "draft": { "id": "draft", "name": "草稿", "description": "初始草稿状态", "type": "initial" },
+            "pending_manager": { "id": "pending_manager", "name": "待主管审批", "description": "等待主管审批", "type": "intermediate" },
+            "approved": { "id": "approved", "name": "已通过", "description": "审批通过", "type": "terminal" },
+            "rejected": { "id": "rejected", "name": "已驳回", "description": "审批驳回", "type": "terminal" }
+          },
+          "order": ["draft", "pending_manager", "approved", "rejected"]
+        },
+        "transitions": {
+          "byId": {
+            "t1": { "id": "t1", "name": "提交审批", "fromStateId": "draft", "toStateId": "pending_manager", "triggerActionId": "action_submit", "allowedRoleIds": ["employee"], "guardCondition": "必填字段已填写" },
+            "t2": { "id": "t2", "name": "主管通过", "fromStateId": "pending_manager", "toStateId": "approved", "triggerActionId": "action_approve", "allowedRoleIds": ["manager"] },
+            "t3": { "id": "t3", "name": "主管驳回", "fromStateId": "pending_manager", "toStateId": "rejected", "triggerActionId": "action_reject", "allowedRoleIds": ["manager"], "guardCondition": "必须填写驳回原因" }
+          },
+          "order": ["t1", "t2", "t3"]
+        },
+        "initialStateId": "draft",
+        "terminalStateIds": ["approved", "rejected"]
+      }
+    },
+    "order": ["sm_expense"]
+  }
 }
 ```
 

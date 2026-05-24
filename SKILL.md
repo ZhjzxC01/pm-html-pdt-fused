@@ -1,7 +1,7 @@
 ---
 name: pm-html-pdt-fused
-version: 2.0.0
-description: 用户要求写 PRD、产品需求、功能清单、B 端原型、高保真 HTML 原型、页面标注、PRD 标注原型、根据原型生成 PRD、根据需求生成原型、检查 PRD 与原型一致性、设计体系生成、品牌设计、Logo/Icon、演示文稿、Banner 设计时使用。
+version: 2.1.0
+description: 用户要求写 PRD、产品需求、功能清单、B 端原型、高保真 HTML 原型、页面标注、PRD 标注原型、根据原型生成 PRD、根据需求生成原型、检查 PRD 与原型一致性、设计体系生成、品牌设计、Logo/Icon、演示文稿、Banner 设计时使用。支持消费 biz-analysis 的 analysis-data.json 自动生成全交互原型和深度 PRD。
 metadata:
   short-description: B 端 PRD / 原型 / 标注 / 设计智能闭环
 ---
@@ -158,6 +158,9 @@ pnpm dev -- serve --project <项目目录>
 2. 其他中文 B 端需求会走通用规则生成器，自动推断项目名、核心业务对象和审批流开关。
 3. PRD 支持 S/M/L 三级模板：AI 自动评估需求复杂度并建议级别，用户确认后使用对应模板生成 PRD。
 4. 当前通用生成器仍是保守模板，不等同于完整大模型需求理解；复杂行业字段、项目类型泛化和旧版模板迁移仍是后续增强任务。
+5. biz-analysis 产出的 `analysis-data.json` 可作为原始资料自动消费——通过结构化映射将实体属性（含 frontendType）、交互模式（interactionPatterns）、页面布局（pageLayout）、状态机操作（uiAction）直接注入原型和 PRD 生成。
+6. 原型要求全交互可用：每个页面必须有真实 JS 交互（Mock 数据驱动筛选/表单/Tab 切换），不允许纯静态 HTML 输出。
+7. PRD 要求全功能深度覆盖：P0+P1 功能必须有完整 5 板块规格（基本信息、操作流程、字段级业务规则、异常场景、关联依赖），不能只有一行标题。
 
 ## Anti-Pattern 自查清单
 

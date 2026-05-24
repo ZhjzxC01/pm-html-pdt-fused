@@ -249,8 +249,10 @@ async function buildLlmSteps(
     }
   }
   type OkStep = { ok: true; step: GeneratorResult };
-  const t2a = tier2a as [OkStep, OkStep, OkStep];
-  const t2b = tier2b as [OkStep, OkStep];
+  const [t2a0, t2a1, t2a2] = tier2a;
+  const [t2b0, t2b1] = tier2b;
+  const t2a = [t2a0, t2a1, t2a2] as [OkStep, OkStep, OkStep];
+  const t2b = [t2b0, t2b1] as [OkStep, OkStep];
 
   // Gate 3: Review prototypeSpec + flowSpec
   let guidance3 = "";
@@ -267,7 +269,7 @@ async function buildLlmSteps(
   let guidance4 = "";
   if (reviewEnabled) {
     const htmlContext = JSON.stringify({ htmlPrototype: t2a[1].step.patches, prototypeAnnotationSpec: t2b[1].step.patches });
-    const gate4 = await runReviewGate("gate_4_html_annotation", `${input}\n\n${htmlContext}`, options);
+    const gate4 = await runReviewGate("gate_4_html_testcase", `${input}\n\n${htmlContext}`, options);
     guidance4 = formatGuidance(gate4);
     if (strictMode && gate4.criticalFindings.length > 0) {
       return { ok: false, issues: gate4.criticalFindings.map((f, i) => ({ id: `issue_review_gate4_${i + 1}`, severity: "error" as const, code: "review_critical_finding", message: f.description })) };

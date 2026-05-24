@@ -259,13 +259,13 @@ function mapFieldType(raw: string): FieldType | null {
   return FIELD_TYPE_MAP[raw] ?? null;
 }
 
-type ModuleType = "filter" | "table" | "form" | "detail_card" | "approval_panel" | "log_timeline" | "chart" | "summary";
+type ModuleType = "filter" | "table" | "form" | "detail_card" | "tabs" | "steps" | "approval_panel" | "log_timeline" | "empty_state" | "exception_state";
 
 function inferModuleType(instruction: string): ModuleType {
   if (instruction.includes("审批")) return "approval_panel";
   if (instruction.includes("日志") || instruction.includes("记录")) return "log_timeline";
-  if (instruction.includes("图表") || instruction.includes("统计")) return "chart";
-  if (instruction.includes("汇总") || instruction.includes("摘要")) return "summary";
+  if (instruction.includes("标签") || instruction.includes("切换")) return "tabs";
+  if (instruction.includes("步骤") || instruction.includes("流程")) return "steps";
   if (instruction.includes("表单")) return "form";
   if (instruction.includes("列表") || instruction.includes("表格")) return "table";
   if (instruction.includes("筛选") || instruction.includes("过滤")) return "filter";

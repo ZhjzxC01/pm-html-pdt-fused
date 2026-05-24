@@ -63,12 +63,13 @@ interface InteractiveData {
   mockDataSets: Array<{ id: string; targetPageId: string | undefined; records: Array<Record<string, unknown>> }>;
   actions: Array<{ id: string; name: string; pageId: string }>;
   fields: Array<{ id: string; name: string; required: boolean; pageId: string; moduleId: string }>;
+  interactions: Array<{ moduleId: string; pageId: string; patterns: string[] }>;
 }
 
 function extractInteractiveData(state: ProjectState): InteractiveData {
   const spec = state.prototypeSpec;
   if (!spec) {
-    return { pages: [], navigation: [], stateMachines: [], mockDataSets: [], actions: [], fields: [] };
+    return { pages: [], navigation: [], stateMachines: [], mockDataSets: [], actions: [], fields: [], interactions: [] };
   }
 
   const pages = spec.pages.order.map((id) => {
@@ -83,6 +84,7 @@ function extractInteractiveData(state: ProjectState): InteractiveData {
 
   const actions: InteractiveData["actions"] = [];
   const fields: InteractiveData["fields"] = [];
+  const interactions: InteractiveData["interactions"] = [];
 
   for (const pageId of spec.pages.order) {
     const page = spec.pages.byId[pageId];
@@ -95,6 +97,9 @@ function extractInteractiveData(state: ProjectState): InteractiveData {
       for (const fieldId of module.fields.order) {
         const field = module.fields.byId[fieldId];
         fields.push({ id: field.id, name: field.name, required: field.required ?? false, pageId, moduleId });
+      }
+      if (module.interactions && module.interactions.length > 0) {
+        interactions.push({ moduleId: module.id, pageId, patterns: module.interactions });
       }
     }
   }
@@ -126,7 +131,7 @@ function extractInteractiveData(state: ProjectState): InteractiveData {
     }
   }
 
-  return { pages, navigation, stateMachines, mockDataSets, actions, fields };
+  return { pages, navigation, stateMachines, mockDataSets, actions, fields, interactions };
 }
 
 export interface DesignSystemConfig {
@@ -429,6 +434,14 @@ function init(){
   bindStateTransitions();
   bindFormValidation();
   populateMockData();
+  bindInnerTabs();
+  bindFilters();
+  bindPagination();
+  bindConfirmDialogs();
+  bindToasts();
+  bindConditionalDisplay();
+  bindExpandCollapse();
+  bindHoverActions();
   showPage(currentPageId);
   updateStatusBar();
 }
@@ -623,6 +636,200 @@ function populateMockData(){
     table.appendChild(tbody);
     tableModule.appendChild(table);
   });
+}
+
+function bindInnerTabs(){
+  document.querySelectorAll('[data-tab-group]').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var groupId=btn.dataset.tabGroup;
+      var targetId=btn.dataset.tabTarget;
+      var container=btn.closest('[data-page-id]');
+      if(!container)return;
+      container.querySelectorAll('[data-tab-group="'+groupId+'"]').forEach(function(b){
+        b.classList.remove('active');
+        b.style.borderBottom='2px solid transparent';
+        b.style.color='var(--color-on-surface-variant)';
+      });
+      btn.classList.add('active');
+      btn.style.borderBottom='2px solid var(--color-primary)';
+      btn.style.color='var(--color-primary)';
+      container.querySelectorAll('[data-tab-panel="'+groupId+'"]').forEach(function(panel){
+        panel.style.display=panel.dataset.tabId===targetId?'':'none';
+      });
+    });
+  });
+}
+
+function bindFilters(){
+  document.querySelectorAll('[data-module-id*="filter"] select,[data-module-id*="filter"] input[type="text"]').forEach(function(filterEl){
+    var debounceTimer;
+    function applyFilter(){
+      var pageSection=filterEl.closest('[data-page-id]');
+      if(!pageSection)return;
+      var table=pageSection.querySelector('.mock-table');
+      if(!table)return;
+      var filters={};
+      pageSection.querySelectorAll('[data-module-id*="filter"] select,[data-module-id*="filter"] input[type="text"]').forEach(function(f){
+        if(f.value)filters[f.dataset.filterField||f.id]=f.value.toLowerCase();
+      });
+      var visible=0;
+      table.querySelectorAll('tbody tr').forEach(function(row){
+        var show=true;
+        Object.keys(filters).forEach(function(key){
+          if(!row.textContent.toLowerCase().includes(filters[key]))show=false;
+        });
+        row.style.display=show?'':'none';
+        if(show)visible++;
+      });
+      var empty=pageSection.querySelector('[data-interaction="empty-state"]');
+      if(empty)empty.style.display=visible===0?'':'none';
+      var countEl=pageSection.querySelector('[data-filter-count]');
+      if(countEl)countEl.textContent=visible+' 条结果';
+    }
+    filterEl.addEventListener(filterEl.tagName==='SELECT'?'change':'input',function(){
+      clearTimeout(debounceTimer);
+      debounceTimer=setTimeout(applyFilter,300);
+    });
+  });
+}
+
+function bindPagination(){
+  document.querySelectorAll('.mock-table').forEach(function(table){
+    var PAGE_SIZE=10;
+    var rows=table.querySelectorAll('tbody tr');
+    if(rows.length<=PAGE_SIZE)return;
+    var currentPage=1;
+    var totalPages=Math.ceil(rows.length/PAGE_SIZE);
+    var pageSection=table.closest('[data-page-id]');
+    if(!pageSection)return;
+    var pager=document.createElement('div');
+    pager.className='proto-pager';
+    pager.style.cssText='display:flex;align-items:center;gap:8px;margin-top:16px;padding:8px 0;font:400 13px/20px Inter,sans-serif;color:var(--color-on-surface-variant);';
+    pageSection.appendChild(pager);
+    function render(){
+      rows.forEach(function(r,i){
+        r.style.display=(i>=(currentPage-1)*PAGE_SIZE&&i<currentPage*PAGE_SIZE)?'':'none';
+      });
+      var html='<span>共 '+rows.length+' 条</span>';
+      html+=currentPage>1?'<button style="height:28px;padding:0 8px;border:1px solid var(--color-outline-variant);border-radius:var(--shape-sm);background:var(--color-surface);cursor:pointer;font:400 12px/16px Inter,sans-serif" onclick="void(0)">上一页</button>':'';
+      for(var i=1;i<=totalPages;i++){
+        html+='<button style="height:28px;min-width:28px;padding:0 6px;border:1px solid '+(i===currentPage?'var(--color-primary)':'var(--color-outline-variant)')+';border-radius:var(--shape-sm);background:'+(i===currentPage?'var(--color-primary)':'var(--color-surface)')+';color:'+(i===currentPage?'var(--color-on-primary)':'var(--color-on-surface)')+';cursor:pointer;font:400 12px/16px Inter,sans-serif" data-page="'+i+'">'+i+'</button>';
+      }
+      html+=currentPage<totalPages?'<button style="height:28px;padding:0 8px;border:1px solid var(--color-outline-variant);border-radius:var(--shape-sm);background:var(--color-surface);cursor:pointer;font:400 12px/16px Inter,sans-serif" onclick="void(0)">下一页</button>':'';
+      pager.innerHTML=html;
+      pager.querySelectorAll('button').forEach(function(btn){
+        btn.addEventListener('click',function(){
+          if(btn.dataset.page){currentPage=parseInt(btn.dataset.page);}
+          else if(btn.textContent==='上一页'){currentPage--;}
+          else if(btn.textContent==='下一页'){currentPage++;}
+          render();
+        });
+      });
+    }
+    render();
+  });
+}
+
+function bindConfirmDialogs(){
+  document.addEventListener('click',function(e){
+    var btn=e.target.closest('[data-action-type="delete"],[data-action-type="reject"]');
+    if(!btn)return;
+    e.preventDefault();e.stopPropagation();
+    var actionName=btn.dataset.actionType==='delete'?'删除':'驳回';
+    var isDanger=btn.dataset.actionType==='delete';
+    showConfirm('确认'+actionName,actionName+'后不可恢复，是否确认？',function(){
+      showToast(actionName+'操作已执行','success');
+      var row=btn.closest('tr');
+      if(row){row.style.opacity='0.3';row.style.pointerEvents='none';}
+    },isDanger);
+  });
+}
+
+function showConfirm(title,message,onConfirm,danger){
+  var overlay=document.createElement('div');
+  overlay.className='proto-dialog-overlay show';
+  overlay.innerHTML='<div class="proto-dialog"><h3>'+title+'</h3><p>'+message+'</p>'
+    +'<div class="proto-dialog-actions"><button class="cancel">取消</button>'
+    +'<button class="'+(danger?'confirm-danger':'confirm')+'">确认</button></div></div>';
+  document.body.appendChild(overlay);
+  overlay.querySelector('.cancel').onclick=function(){overlay.remove();};
+  overlay.querySelector('.confirm-danger,.confirm').onclick=function(){overlay.remove();onConfirm();};
+  overlay.addEventListener('click',function(e){if(e.target===overlay)overlay.remove();});
+}
+
+function bindToasts(){
+  window.showToast=function(message,type){
+    var t=document.createElement('div');
+    t.className='proto-toast';
+    var colors={success:'var(--color-tertiary)',error:'var(--color-error)',warning:'#D97706',info:'var(--color-primary)'};
+    t.style.borderLeft='4px solid '+(colors[type]||colors.info);
+    t.textContent=message;
+    document.body.appendChild(t);
+    requestAnimationFrame(function(){t.classList.add('show');});
+    setTimeout(function(){t.classList.remove('show');setTimeout(function(){t.remove();},300);},3000);
+  };
+  bindStateTransitions();
+  var origBind=bindStateTransitions;
+  document.addEventListener('click',function(e){
+    var el=e.target.closest('[data-action-id]');
+    if(!el)return;
+    var sm=P.stateMachines[0];
+    if(!sm)return;
+    var transition=sm.transitions.find(function(t){
+      return t.triggerActionId===el.dataset.actionId&&t.fromStateId===currentStateId;
+    });
+    if(transition){
+      var newState=sm.states.find(function(s){return s.id===transition.toStateId;});
+      if(newState)showToast('状态已变更为：'+newState.name,'success');
+    }
+  });
+}
+
+function bindConditionalDisplay(){
+  document.querySelectorAll('[data-condition-field]').forEach(function(target){
+    var fieldId=target.dataset.conditionField;
+    var condValue=target.dataset.conditionValue;
+    var source=document.getElementById(fieldId)||document.querySelector('[data-field-id="'+fieldId+'"] select,[data-field-id="'+fieldId+'"] input');
+    if(!source)return;
+    function toggle(){
+      var val=source.value||'';
+      var match=condValue?val===condValue:!!val;
+      target.style.display=match?'':'none';
+      if(!match){
+        target.querySelectorAll('input,select,textarea').forEach(function(inp){inp.value='';});
+      }
+    }
+    source.addEventListener('change',toggle);
+    toggle();
+  });
+}
+
+function bindExpandCollapse(){
+  var style=document.createElement('style');
+  style.textContent='[data-expandable] .expand-body{transition:max-height 0.3s ease}'+
+    '[data-expandable].collapsed .expand-body{display:none}'+
+    '[data-expandable].collapsed .expand-chevron{transform:rotate(-90deg)}'+
+    '.expand-chevron{display:inline-block;transition:transform 0.2s;margin-right:8px;font-size:12px}'+
+    '.expand-header{cursor:pointer;user-select:none;padding:8px 0;display:flex;align-items:center}';
+  document.head.appendChild(style);
+  document.querySelectorAll('[data-expandable]').forEach(function(section){
+    var header=section.querySelector('.expand-header');
+    if(!header)return;
+    var chevron=header.querySelector('.expand-chevron');
+    if(!chevron){chevron=document.createElement('span');chevron.className='expand-chevron';chevron.textContent='▼';header.insertBefore(chevron,header.firstChild);}
+    header.addEventListener('click',function(){section.classList.toggle('collapsed');});
+  });
+}
+
+function bindHoverActions(){
+  var style=document.createElement('style');
+  style.textContent='.mock-table .row-actions{opacity:0;transition:opacity 0.15s;display:inline-flex;gap:4px;align-items:center}'+
+    '.mock-table tbody tr:hover .row-actions{opacity:1}'+
+    '.mock-table tbody tr:hover{background:var(--color-surface-container-low)}'+
+    '.row-actions button{height:26px;padding:0 8px;font:500 12px/16px Inter,sans-serif;border:1px solid var(--color-outline-variant);border-radius:var(--shape-sm);background:var(--color-surface);cursor:pointer;color:var(--color-primary)}'+
+    '.row-actions button:hover{background:var(--color-primary-container)}'+
+    '.row-actions button.danger-btn{color:var(--color-error)}.row-actions button.danger-btn:hover{background:var(--color-error-container)}';
+  document.head.appendChild(style);
 }
 
 if(document.readyState==="loading"){

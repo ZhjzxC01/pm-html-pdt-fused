@@ -62,6 +62,7 @@ export function validateByProfile(state: ProjectState, profile: ValidationProfil
       issues.push(...validateArtifactManifestBasics(state));
       break;
     case "schema_only":
+    case "generation_complexity":
     case "generation_requirement":
     case "generation_prd":
     case "consistency_check":
@@ -86,18 +87,6 @@ function validateArtifactManifestBasics(state: ProjectState): ValidationIssue[] 
         code: "artifact_manifest_order_missing_by_id",
         message: `产物清单的 order 包含不存在的产物：${id}`,
         path: "/artifactManifest/items/order"
-      });
-    }
-  }
-
-  for (const item of Object.values(state.artifactManifest.items.byId)) {
-    if (item.artifactType === ("project_state_json" as typeof item.artifactType)) {
-      issues.push({
-        id: `issue_artifact_manifest_project_state_${item.id}`,
-        severity: "error",
-        code: "artifact_manifest_contains_project_state",
-        message: "产物清单不得管理 project-state.json。",
-        path: `/artifactManifest/items/byId/${item.id}`
       });
     }
   }

@@ -28,6 +28,7 @@ const generatedAtBySource: Partial<Record<PatchSource, StateArtifactType>> = {
   prd_generation: "prdSpec",
   test_case_generation: "testCaseSpec",
   prototype_annotation_generation: "prototypeAnnotationSpec",
+  complexity_assessment: "complexityAssessment",
   consistency_check: "issues"
 };
 
@@ -372,6 +373,7 @@ function inferDirtyArtifactsFromPaths(paths: string[]): StateArtifactType[] {
     if (path.startsWith("/flowSpec")) artifacts.push("flowSpec");
     if (path.startsWith("/prdSpec")) artifacts.push("prdSpec");
     if (path.startsWith("/testCaseSpec")) artifacts.push("testCaseSpec");
+    if (path.startsWith("/complexityAssessment")) artifacts.push("complexityAssessment");
     if (path.startsWith("/prototypeAnnotationSpec")) artifacts.push("prototypeAnnotationSpec");
     if (path.startsWith("/artifactManifest")) artifacts.push("artifactManifest");
     if (path.startsWith("/issues")) artifacts.push("issues");

@@ -1,4 +1,5 @@
 import type {
+  EntityType,
   PageAction,
   ProjectState,
   StateArtifactType,
@@ -337,7 +338,7 @@ function buildAddModuleToPagePatches(
   modules.byId[moduleId] = {
     id: moduleId,
     name: action.moduleName,
-    type: action.moduleType as "filter" | "table" | "form" | "detail_card" | "tabs" | "steps" | "approval_panel" | "log_timeline" | "empty_state" | "exception_state",
+    type: action.moduleType,
     fields: { byId: {}, order: [] },
     sourceRefs: []
   };
@@ -506,7 +507,7 @@ function buildAddUiStatePatches(
   const stateId = uniqueId(`ui_state_${action.stateType}_${page.id.replace(/^page_/, "")}`, uiStates.byId);
   uiStates.byId[stateId] = {
     id: stateId,
-    type: action.stateType as "normal" | "loading" | "empty" | "error" | "no_permission",
+    type: action.stateType,
     name: action.stateName,
     description: action.description
   };
@@ -738,7 +739,7 @@ function buildAddPrdSectionPatches(
     title: action.title,
     type: "appendix",
     target: action.targetEntityType && action.targetEntityId
-      ? { entityType: action.targetEntityType as "goal" | "role" | "business_object" | "scenario" | "feature" | "acceptance_criterion" | "page" | "module" | "field" | "action" | "permission" | "ui_state" | "business_state" | "state_transition" | "flow" | "prd_section" | "test_case" | "prototype_annotation", entityId: action.targetEntityId }
+      ? { entityType: action.targetEntityType as EntityType, entityId: action.targetEntityId }
       : undefined,
     content: action.content,
     sortOrder: prdSpec.sections.order.length,

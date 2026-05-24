@@ -24,6 +24,7 @@ import type {
   patchSourceSchema,
   prdSpecSchema,
   projectStateSchema,
+  prototypeAnnotationSchema,
   prototypeAnnotationSpecSchema,
   prototypeMetaSchema,
   prototypeSpecSchema,
@@ -73,6 +74,7 @@ export type FlowSpec = z.infer<typeof flowSpecSchema>;
 export type PRDSpec = z.infer<typeof prdSpecSchema>;
 export type TestCaseSpec = z.infer<typeof testCaseSpecSchema>;
 export type PrototypeAnnotationSpec = z.infer<typeof prototypeAnnotationSpecSchema>;
+export type PrototypeAnnotation = z.infer<typeof prototypeAnnotationSchema>;
 export type ActivatePathStep = z.infer<typeof activatePathStepSchema>;
 export type BacklogItem = z.infer<typeof backlogItemSchema>;
 export type ArtifactManifest = z.infer<typeof artifactManifestSchema>;

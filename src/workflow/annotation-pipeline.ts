@@ -1,4 +1,8 @@
+import path from "node:path";
 import { runPrototypeAnnotationAgent } from "../agents/prototype-annotation-agent.js";
+import { applyPatchEnvelope } from "../state/patch-manager.js";
+import { loadProjectState, saveProjectState } from "../state/project-state-manager.js";
+import type { ProjectState, StateArtifactType, ValidationIssue } from "../types/index.js";
 import { renderAndCommit } from "./render-pipeline.js";
 import type { LLMProvider } from "../llm/llm-provider.js";
 
