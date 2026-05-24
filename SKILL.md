@@ -24,7 +24,7 @@ metadata:
    - **review**：启用 6 角色审查，发现问题仅提醒，不阻断生成。
    - **strict**：启用 6 角色审查，发现 critical 问题时阻断生成。
    用户选择后，后续所有 generate 调用自动读取该配置，无需重复指定。如果用户未明确选择，默认使用 `none`。
-9. 如果用户提供了参考资料（聊天截图、Word、Excel、PDF、Markdown 等），将其保存到 `<project-name>/raw-materials/` 目录，然后逐份读取并提取关键业务信息（角色、流程、规则、字段、阈值等），整理成结构化摘要后向用户确认，再进入功能清单。支持的文件类型：`.png`/`.jpg`/`.jpeg`/`.gif`/`.webp`（图片，由 AI 视觉识别）、`.docx`/`.doc`（Word）、`.xlsx`/`.xls`（Excel）、`.pdf`、`.md`/`.txt`（纯文本）。如果用户在对话中直接粘贴了截图或附件，也视为原始资料，保存到 `raw-materials/` 后同样处理。
+9. 如果用户提供了参考资料（聊天截图、Word、Excel、PDF、Markdown 等），将其保存到 `<project-name>/raw-materials/` 目录，然后逐份读取并提取关键业务信息（角色、流程、规则、字段、阈值等），整理成结构化摘要后向用户确认，再进入功能清单。支持的文件类型：`.png`/`.jpg`/`.jpeg`/`.gif`/`.webp`（图片，由 AI 视觉识别）、`.docx`/`.doc`（Word）、`.xlsx`/`.xls`（Excel）、`.pdf`、`.md`/`.txt`（纯文本）。如果用户在对话中直接粘贴了截图或附件，也视为原始资料，保存到 `raw-materials/` 后同样处理。如果 `raw-materials/` 中包含 `analysis-data.json`（来自 biz-analysis 产出），自动识别并走结构化映射路径：读取 `references/analysis-data-mapping.md`，按照映射规则将 analysis-data.json 中的结构化数据直接映射到 ProjectState 的 requirementCard、prototypeSpec、flowSpec 和 prdSpec 字段，而不是作为普通文本提取信息。映射完成后向用户展示映射摘要（实体→字段数量、状态机→转换数量、功能→页面数量），等待用户确认。
 
 ### HARD-GATE 硬门控机制
 
@@ -117,6 +117,7 @@ metadata:
 | PRD L 级模板 | `references/prd-templates/l-enterprise-prd.md` | 生成 L 级完整版 B 端 PRD 时 |
 | 质量校验 | `references/quality-checks.md` | 执行一致性检查或质量校验时 |
 | 自查清单 | `references/self-review.md` | 交付前自查时 |
+| 原始资料映射 | `references/analysis-data-mapping.md` | 输入包含 biz-analysis 的 analysis-data.json 时，需要理解结构化映射规则时 |
 
 ## 对话模式 vs CLI 模式
 
@@ -172,6 +173,7 @@ pnpm dev -- serve --project <项目目录>
 - [ ] **禁止过度设计（YAGNI）**：是否为假设的未来需求预留了接口、字段、扩展点？每个字段和功能必须有当前需求支撑，不能因为"将来可能需要"而添加。
 - [ ] **禁止歧义遗漏**：是否有规则可被两种方式理解但未标记为 pendingQuestion？（参考 self-review.md 歧义扫描）
 - [ ] **确认检查**：至少检查了核心业务对象、状态机终态、审批流开关、角色范围？
+- [ ] **充分利用 biz 分析数据**：如果输入包含 analysis-data.json，是否通过结构化映射路径消费了其中的实体属性、交互模式、状态机和业务规则？（不能忽略结构化数据只当文本处理）
 
 ## 增量修改与回退机制
 

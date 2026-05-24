@@ -189,3 +189,208 @@
 | 数据加载等待 | 加载骨架屏 |
 | 操作完成反馈 | Toast 提示 |
 | 误操作恢复 | 撤销操作 |
+
+## JS 实现参考
+
+以下是每种交互模式在 HTML 原型中的 JavaScript 实现要求。生成原型时，必须为每个声明了交互模式的模块实现对应的 JS 逻辑。
+
+### 行内编辑 (inline-edit)
+
+```javascript
+// 双击 td 进入编辑态，blur 保存，Esc 取消
+document.querySelectorAll('[data-interaction="inline-edit"]').forEach(function(cell) {
+  cell.addEventListener('dblclick', function() {
+    var original = cell.textContent;
+    cell.innerHTML = '<input type="text" value="' + original + '" class="inline-input">';
+    var input = cell.querySelector('input');
+    input.focus();
+    input.addEventListener('blur', function() { cell.textContent = input.value || original; });
+    input.addEventListener('keydown', function(e) { if (e.key === 'Escape') cell.textContent = original; });
+  });
+});
+```
+
+### 快捷操作 (hover-actions)
+
+```css
+.row-actions { opacity: 0; transition: opacity 0.15s; }
+.data-table tbody tr:hover .row-actions { opacity: 1; }
+.data-table tbody tr:hover { background: var(--color-surface-container-low, #f9fafb); }
+.row-actions button { height: 28px; padding: 0 8px; font-size: 12px; }
+```
+
+### 二次确认 (confirm-dialog)
+
+```javascript
+function showConfirm(title, message, onConfirm, isDanger) {
+  var overlay = document.createElement('div');
+  overlay.className = 'confirm-overlay';
+  overlay.innerHTML = '<div class="confirm-box"><h3>' + title + '</h3><p>' + message + '</p>'
+    + '<div class="confirm-actions"><button class="btn-cancel">取消</button>'
+    + '<button class="btn-confirm ' + (isDanger ? 'btn-danger' : '') + '">确认</button></div></div>';
+  document.body.appendChild(overlay);
+  overlay.querySelector('.btn-cancel').onclick = function() { overlay.remove(); };
+  overlay.querySelector('.btn-confirm').onclick = function() { overlay.remove(); onConfirm(); };
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+}
+```
+
+### 级联选择 (cascade-select)
+
+```javascript
+// 父级 change 时清空子级并加载新选项
+document.getElementById('parentSelect').addEventListener('change', function() {
+  var child = document.getElementById('childSelect');
+  child.innerHTML = '<option value="">请选择</option>';
+  var options = CASCADE_DATA[this.value] || [];
+  options.forEach(function(opt) { child.innerHTML += '<option value="' + opt + '">' + opt + '</option>'; });
+});
+```
+
+### 条件显隐 (conditional-display)
+
+```javascript
+document.querySelectorAll('[data-condition-trigger]').forEach(function(trigger) {
+  trigger.addEventListener('change', function() {
+    var target = document.getElementById(trigger.dataset.conditionTarget);
+    var showValues = trigger.dataset.conditionShow.split(',');
+    target.style.display = showValues.includes(trigger.value) ? '' : 'none';
+  });
+});
+```
+
+### 联动校验 (cross-field-validation)
+
+```javascript
+// 结束日期不能早于开始日期
+document.getElementById('endDate').addEventListener('blur', function() {
+  var start = document.getElementById('startDate').value;
+  var end = this.value;
+  var errEl = document.getElementById('endDateError');
+  if (start && end && end < start) {
+    errEl.textContent = '结束日期不能早于开始日期';
+    errEl.style.display = '';
+  } else {
+    errEl.style.display = 'none';
+  }
+});
+```
+
+### 搜索防抖 (search-debounce)
+
+```javascript
+var debounceTimer;
+document.getElementById('searchInput').addEventListener('input', function() {
+  clearTimeout(debounceTimer);
+  var keyword = this.value.toLowerCase();
+  debounceTimer = setTimeout(function() {
+    var rows = document.querySelectorAll('.data-table tbody tr');
+    var visible = 0;
+    rows.forEach(function(row) {
+      var show = !keyword || row.textContent.toLowerCase().includes(keyword);
+      row.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    var empty = document.getElementById('emptyState');
+    if (empty) empty.style.display = visible === 0 ? '' : 'none';
+  }, 300);
+});
+```
+
+### 高级筛选 (advanced-filter)
+
+```javascript
+function applyFilters() {
+  var filters = {};
+  document.querySelectorAll('[data-filter]').forEach(function(el) {
+    filters[el.dataset.filter] = el.value;
+  });
+  var rows = document.querySelectorAll('.data-table tbody tr');
+  var visible = 0;
+  rows.forEach(function(row) {
+    var show = true;
+    Object.keys(filters).forEach(function(key) {
+      if (filters[key] && row.dataset[key] && !row.dataset[key].includes(filters[key])) show = false;
+    });
+    row.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+  var empty = document.getElementById('emptyState');
+  if (empty) empty.style.display = visible === 0 ? '' : 'none';
+}
+document.querySelectorAll('[data-filter]').forEach(function(el) { el.addEventListener('change', applyFilters); });
+document.getElementById('resetFilters')?.addEventListener('click', function() {
+  document.querySelectorAll('[data-filter]').forEach(function(el) { el.value = ''; });
+  applyFilters();
+});
+```
+
+### 空状态引导 (empty-state)
+
+```html
+<div id="emptyState" style="display:none; text-align:center; padding:60px 0; color:#999;">
+  <svg width="64" height="64" viewBox="0 0 64 64" fill="none" style="margin-bottom:16px">
+    <rect x="8" y="12" width="48" height="40" rx="4" stroke="#d1d5db" stroke-width="2" fill="none"/>
+    <line x1="20" y1="26" x2="44" y2="26" stroke="#d1d5db" stroke-width="2"/>
+    <line x1="20" y1="34" x2="36" y2="34" stroke="#d1d5db" stroke-width="2"/>
+  </svg>
+  <p>暂无数据</p>
+  <p style="font-size:12px; margin-top:4px;">请调整筛选条件或新建数据</p>
+</div>
+```
+
+### Toast 反馈 (toast-feedback)
+
+```javascript
+function showToast(message, type) {
+  var t = document.createElement('div');
+  var colors = { success: '#22c55e', error: '#ef4444', warning: '#f59e0b', info: '#3b82f6' };
+  t.style.cssText = 'position:fixed;top:20px;right:20px;padding:12px 20px;border-radius:6px;color:#fff;font-size:14px;z-index:10000;opacity:0;transition:opacity 0.3s;border-left:4px solid ' + (colors[type] || colors.info);
+  t.textContent = message;
+  document.body.appendChild(t);
+  requestAnimationFrame(function() { t.style.opacity = '1'; });
+  setTimeout(function() { t.style.opacity = '0'; setTimeout(function() { t.remove(); }, 300); }, 3000);
+}
+```
+
+### 撤销操作 (undo-action)
+
+```javascript
+function showUndo(message, onUndo) {
+  var bar = document.createElement('div');
+  bar.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:12px 20px;background:#1f2937;color:#fff;border-radius:6px;font-size:14px;z-index:10000;display:flex;align-items:center;gap:12px;';
+  bar.innerHTML = '<span>' + message + '</span><button style="background:#3b82f6;color:#fff;border:none;padding:4px 12px;border-radius:4px;cursor:pointer">撤销</button>';
+  document.body.appendChild(bar);
+  bar.querySelector('button').onclick = function() { onUndo(); bar.remove(); };
+  setTimeout(function() { bar.remove(); }, 5000);
+}
+```
+
+### 标签页记忆 (tab-memory)
+
+```javascript
+// 页面加载时恢复上次选中的 tab
+var savedTab = localStorage.getItem(location.pathname + '-active-tab');
+if (savedTab) {
+  var btn = document.querySelector('[data-tab="' + savedTab + '"]');
+  if (btn) btn.click();
+}
+// tab 切换时保存
+document.querySelectorAll('.tab-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    localStorage.setItem(location.pathname + '-active-tab', btn.dataset.tab);
+  });
+});
+```
+
+### 面包屑导航 (breadcrumb)
+
+```html
+<nav class="breadcrumb" style="font-size:13px;color:#6b7280;margin-bottom:16px;">
+  <a href="index.html" style="color:#3b82f6;text-decoration:none">首页</a>
+  <span style="margin:0 6px">/</span>
+  <a href="javascript:void(0)" onclick="history.back()" style="color:#3b82f6;text-decoration:none">列表页</a>
+  <span style="margin:0 6px">/</span>
+  <span style="color:#374151;font-weight:500">当前页</span>
+</nav>
+```
